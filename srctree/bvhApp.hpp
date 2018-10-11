@@ -20,6 +20,12 @@
 #include "cgra/wavefront.hpp"
 #include "math.h"
 
+
+//bvh includes
+
+#include "BVH.hpp"
+#include "BVHRenderer.hpp"
+
 typedef struct shareGlobals{
 //fill this later
 

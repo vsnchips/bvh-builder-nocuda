@@ -83,6 +83,7 @@ void BVHApp_Application::reloadShader(const char * fragShaderFile){
       }
          */
   gl_errorFlush("linking");
+  bvhRenderer.pickProg = m_program;
    m_program.use();
   gl_errorFlush("use");
 }

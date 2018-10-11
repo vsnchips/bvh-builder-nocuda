@@ -1,5 +1,5 @@
 //version 150 core
-#version 330 core
+#version 430 core
 
 
 in vec3 fragPosition;
@@ -120,7 +120,7 @@ void main() {
 
    vec3 comp;
    
-   comp = fragPosition*100;
+   comp = fragPosition;
   //  comp = vec3(0,0,1);
 
     color = vec4(comp, 0.3);
