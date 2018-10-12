@@ -54,26 +54,22 @@ void BVHApp_Application::doGUI() {
     ImGui::End();
 
     ImGui::Begin("Shader Controls");
-    if(ImGui::Button("Toggle Picker Test")){
-      bvhRenderer.previewPick = !bvhRenderer.previewPick;
-    }
 
     if (ImGui::Button("Reload Shader")){
       reloadShader();
-      bvhRenderer.loadPickShader();
-      cout<< "loaded Pickshader\n";
     }
     ImGui::End();
 
-    ImGui::Begin("meshes");
+    ImGui::Begin("Draw Uniforms");
     static bool wireframe;
     if(ImGui::Checkbox("Draw Wireframe",&wireframe)) {
-        m_mesh.setDrawWireframe(wireframe);
+      cout << "TODO" << "\n";
     }
 
-    //debugging stuff:
-    ImGui::Text("tricount :%d" , m_mesh.m_indices.size()/3);
-    ImGui::Text("vertcount : %d" , m_mesh.m_vertices.size());
+    ImGui::End();
 
+    ImGui::Begin("BVH Info");
+//    ImGui::Text("tricount :%d" , theBVH.getTriCount());
+//    ImGui::Text("tricount :%d" , theBVH.getNodeCount());
     ImGui::End();
 }

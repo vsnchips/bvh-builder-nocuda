@@ -1,7 +1,6 @@
 //version 150 core
 #version 430 core
 
-
 in vec3 fragPosition;
 in vec3 fragNormal;
 

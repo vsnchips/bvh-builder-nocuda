@@ -32,12 +32,7 @@ void BVHApp_Application::onMouseButton(int button, int action, int) {
 }
 
 void BVHApp_Application::mainWindowPick(){
-  
-   freshEditBuff();
-   bvhRenderer.pickProg.setViewMatrix(viewMatrix);
-   bvhRenderer.pickProg.setProjectionMatrix(projectionMatrix);
-                pickID = bvhRenderer.pickTest(app_stylePack, m_mousePosition);
-                bvhRenderer.highLight = pickID;
+//TODO:reimplement this when needed 
 }
 
 void BVHApp_Application::onCursorPos(double xpos, double ypos) {

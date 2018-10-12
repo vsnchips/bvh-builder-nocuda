@@ -3,61 +3,23 @@
 using namespace std;
 using namespace glm;
 
+void BVHApp_Application::updateScene(clock_t nt) {
+  
+  if(shaderStream->update(nt)){ 
+    printf("Change Detected! \n");
+    fragShaderPath = shaderStream->filenames->at(0).c_str(); 
+    reloadShader(); 
+    } 
+
+  drawApp();
+}
+
 char * openShader(){
   nfdchar_t * fromFile;
   NFD_OpenDialog("*,glsl,frag","",&fromFile);
   return fromFile;
 }
-void BVHApp_Application::gl_initQuad(){
 
-  glDeleteVertexArrays(1,&quad_vao);
-  glDeleteBuffers(1,&quad_vbo);
-  glDeleteBuffers(1,&quad_ibo);
-  glGenVertexArrays(1,&quad_vao);
-  glBindVertexArray(quad_vao);
-  glGenBuffers(1,&quad_vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-  glGenBuffers(1,&quad_ibo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,quad_ibo);
-
-  vector<vec3> points; points.clear();
-  points.push_back(vec3(-1,-1,0));
-  points.push_back(vec3(1,-1,0));
-  points.push_back(vec3(1,1,0));
-  points.push_back(vec3(-1,1,0));
-  vector<unsigned int> indices; indices.clear();
-  indices.push_back(0);
-  indices.push_back(1);
-  indices.push_back(2);
-  indices.push_back(2);
-  indices.push_back(3);
-  indices.push_back(0);
- 
-  size_t size = sizeof(vec3) * 4;
-  const void * buffHead =  reinterpret_cast<const void *>(&(points[0]));
-  glBufferData(GL_ARRAY_BUFFER, size, buffHead, GL_STATIC_DRAW );
-
-
-  size = sizeof(unsigned int) * 6;
-  buffHead = reinterpret_cast<const void *> (&indices[0]);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, buffHead, GL_STATIC_DRAW); 
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,sizeof(vec3),0);
-  
-
-}
-
-void BVHApp_Application::gl_drawQuad(){
-  //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  gl_errorFlush("polygonmode");
-  glBindVertexArray(quad_vao);
-  gl_errorFlush("bindvao");
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-  gl_errorFlush("drawElements");
-
-}
 
 void BVHApp_Application::reloadShader(){
      reloadShader(fragShaderPath);
@@ -83,46 +45,8 @@ void BVHApp_Application::reloadShader(const char * fragShaderFile){
       }
          */
   gl_errorFlush("linking");
-  bvhRenderer.pickProg = m_program;
-   m_program.use();
+  m_program.use();
   gl_errorFlush("use");
-}
-
-void BVHApp_Application::init(const char * fragShaderFile) {
-    
-  fragShaderPath = fragShaderFile;
-
-   // Create a view matrix that positions the camera
-    // 10 units behind the object
-    viewMatrix = glm::mat4 (1);
-    viewMatrix[3] = glm::vec4(0, 0, -1, 1);
-
-    xax = glm::vec3(1.,0.,0.);
-    yax = glm::vec3(0.,1.,0.);
-    zax = glm::vec3(0.,0.,1.);
-
-    m_translation.z=-2.0f;
-
-    //Load the objs;
-    loadObj("res/models/sphere.obj",m_spheremesh);
-  gl_errorFlush("sphere");
-
-    loadObj("res/models/bunny.obj",m_mesh);
-  gl_errorFlush("bunny");
-  
-  triangleMode = GL_TRIANGLES;
-
-//BVH App stuff
-//
-//
-    if (!fragShaderFile) fragShaderFile = openShader();
-    app_shaderFilenames.clear();
-    app_shaderFilenames.push_back(string(fragShaderFile));
-    shaderStream = new vmpwStringStreamConcat(&app_shaderFilenames);
-
-    reloadShader();
-    gl_initQuad();
-   
 }
 
 
@@ -165,17 +89,27 @@ void BVHApp_Application::loadObj(const char *filename,cgra::Mesh &targetMesh) {
 
 }
 
+void BVHApp_Application::drawApp(){
+  //Refresh viewport 
+  glfwMakeContextCurrent(m_window);
+  freshEditBuff();
+  gl_ViewPrep();
+  m_program.setProjectionMatrix(projectionMatrix);
+  m_program.setViewMatrix(viewMatrix);
+  m_program.use();
+  app_BVHRenderer->execute();
+  
+  ImGui_ImplGlfwGL3_NewFrame();
+  doGUI();
+  ImGui::Render();
 
-void BVHApp_Application::freshEditBuff(){
+  glfwSwapBuffers(m_window);
 
-      int width, height;
-      glfwGetFramebufferSize(m_window, &width, &height);
-      glViewport(0, 0, width, height);
-      setWindowSize(width, height);
-      glClearColor(0, 0, 0.1, 1); // Clears the color to a dark blue
-      glClearDepth(1); // Clears the depth buffer to it's maximum value
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glEnable( GL_DEPTH_TEST );
+
+  freshEditBuff();// reset the Viewport transform;
+
+
+
 
 }
 
@@ -199,37 +133,52 @@ void BVHApp_Application::gl_ViewPrep(){
 
 }
 
-void BVHApp_Application::updateScene(clock_t nt) {
-  
-  if(shaderStream->update(nt)){ 
-    printf("Change Detected! \n");
-    fragShaderPath = shaderStream->filenames->at(0).c_str(); 
-    reloadShader(); 
-    } 
-  //Refresh viewport 
-  glfwMakeContextCurrent(m_window);
-  freshEditBuff();
+void BVHApp_Application::sendUniforms(){}
 
-  gl_ViewPrep();
-    
-  bvhRenderer.pickProg.setProjectionMatrix(projectionMatrix);
-  bvhRenderer.pickProg.setViewMatrix(viewMatrix);
-  m_program.setProjectionMatrix(projectionMatrix);
-  m_program.setViewMatrix(viewMatrix);
-    
-  m_program.use();
-  //bvhRenderer.execute();
-  gl_drawQuad(); 
-  
-  glUseProgram(0);
-               
-  ImGui_ImplGlfwGL3_NewFrame();
-  doGUI();
-  ImGui::Render();
+void BVHApp_Application::freshEditBuff(){
 
-  glfwSwapBuffers(m_window);
-
-
-  freshEditBuff();// reset the Viewport transform;
+      int width, height;
+      glfwGetFramebufferSize(m_window, &width, &height);
+      glViewport(0, 0, width, height);
+      setWindowSize(width, height);
+      glClearColor(0, 0, 0.1, 1); // Clears the color to a dark blue
+      glClearDepth(1); // Clears the depth buffer to it's maximum value
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      glEnable( GL_DEPTH_TEST );
 
 }
+// GUI implementation defined in seperate file
+void BVHApp_Application::init(const char * fragShaderFile) {
+   
+    app_BVHRenderer = new BVHRenderer(m_window);
+  fragShaderPath = fragShaderFile;
+
+    //View Stuff
+    viewMatrix = glm::mat4 (1);
+    viewMatrix[3] = glm::vec4(0, 0, -1, 1);
+    xax = glm::vec3(1.,0.,0.);
+    yax = glm::vec3(0.,1.,0.);
+    zax = glm::vec3(0.,0.,1.);
+    m_translation.z=-2.0f;
+
+    //Load the objs;
+    loadObj("res/models/sphere.obj",app_testmesh1);
+  gl_errorFlush("sphere");
+    loadObj("res/models/bunny.obj",app_testmesh2);
+  gl_errorFlush("bunny");
+
+  //Shader tracking stuff
+  if (!fragShaderFile) fragShaderFile = openShader();
+    app_shaderFilenames.clear();
+    app_shaderFilenames.push_back(string(fragShaderFile));
+    shaderStream = new vmpwStringStreamConcat(&app_shaderFilenames);
+    reloadShader();
+    
+  //Renderer Stuff
+    app_BVHRenderer->initQuad();
+    app_BVHRenderer->bvh_program = m_program.m_glprogram;
+   
+}
+
+
+

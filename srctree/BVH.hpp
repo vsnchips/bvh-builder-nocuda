@@ -1,5 +1,10 @@
 #pragma once
 
+// BVH HEADER FILE
+// Has the structs and classes for the elements of the  bvh structure, 
+// the BVH state, builder,  and converter class, 
+// and the sender prototype.
+
 #include "includes-l1.hpp"
 
 struct bvh_ray{
@@ -7,6 +12,15 @@ struct bvh_ray{
   glm::vec3 p;
   glm::vec3 r;
 };
+
+//Shared structs
+struct BVH_BBox{
+  glm::mat3 base;
+  glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
+  float volume;
+
+};
+//Prims
 struct bvhPrimitive{
   virtual ~bvhPrimitive() {}
   virtual BVH_BBox getBBox();
@@ -19,61 +33,63 @@ struct bvhTriangle : bvhPrimitive{
   glm::vec3 na, nb, nc;   //Normals
   int matID;
   BVH_BBox getBBox(); //TODO:get the longest side as x, project it to the adjacent for y, set z to 0, there you go.
-}
-
-
-struct BVH_BBox{
-  glm::mat3 base;
-  glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
-  float volume;
-
 };
 
-class BVHNode{
+//Nodes
+struct BVHNode{
   BVH_BBox bb;
-  virtual void updateBB();  
-};
+  virtual void updateBB(); 
+  virtual ~BVHNode(){}
+};//base type
 
-class BVHParentNode : BVHNode{
-  
-  BVHParentNode(BVHNode * a, BVNode * b); //TODO:comparative constructor
+struct BVHParentNode : BVHNode{
+  BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative constructor
   //optionally weight the tree, in a way that doesnt affect topology or emptiness maximization, but it may be useful to prefer checks against bigger volumes first.
   BVHNode * largest;
   BVHNode * smallest;
   void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
-
 };
 
-class BVHLeaf : BVHNode{
+struct BVHLeaf : BVHNode{
   bvhPrimitive prim;
   void updateBB(); //TODO: get a bbox from the primitive
 };
 
-BVHNode BVH::proposeNode( BVHNode * a, BVHNode * b){
-  BVHNode proposal;
-  proposal = BVHNode(a,b);
-  virtual ~BVHNode() {};
-}
+////////////////////////////////////////////////////////////////////////////////
 
-//////////// Main Host Side BVH Class/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+///                               Main Host Side BVH Class                  ////
 class BVH{
 
   public:
   void initBVH(); //sets up gl buffers
-  std::vector<Primitive> leaves; //All the nitty gritty bits
+  std::vector<bvhPrimitive> leaves; //All the nitty gritty bits
   std::vector<BVHNode> forest;  // All the traversal start points.
 
   
   void clearScene(){
-    theForestry.forest.clear();
-    theForestry.leaves.clear();
+    forest.clear();
+    leaves.clear();
   }
 
-  void addTris(std::vector<vec3> points, std::vector<vec2> uvs, std::vector<unsigned int> trispecs, s, int matID);
+  //Primitive Loading:
+  void addVerts(
+      std::vector<glm::vec3> points, std::vector<glm::vec2> uvs);
+  void addTris(
+      std::vector<unsigned int> trispecs, int matID);
 
   //Building Functions
   private:
-  BVHNode proposeNode( BVHNode * a, BVHNode * b);
 };
+////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+//    HELPERS                           //
 int sendBVH(BVH & theB, GLFWwindow * ctx);
+////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////
+//IMPLEMENTATIONS
+
+
+////////////////////////////////////////////////////////////////////////////////

@@ -73,14 +73,17 @@ add_subdirectory(res) # Resources; for example shaders
 #
 # If you add any new files, remember to add them here
 SET(sources
+  #news
+  #BVH.cpp
   submods/stringStreamConCat/vmpwStringStreamConcat.cpp
+  BVHRenderer.hpp
+  BVHRenderer.cpp
   bvhApp.hpp
   bvhApp.cpp
+  #olds
   bvhApp_dogui.cpp
   bvhApp_inevents.cpp
   drawStyle.hpp
-  bvhApp_renderer.hpp
-  bvhApp_renderer.cpp
   main.cpp
 )
 
