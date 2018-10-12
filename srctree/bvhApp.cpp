@@ -47,6 +47,7 @@ void BVHApp_Application::reloadShader(const char * fragShaderFile){
   gl_errorFlush("linking");
   m_program.use();
   gl_errorFlush("use");
+  app_BVHRenderer->bvh_program = m_program.m_glprogram;
 }
 
 
@@ -104,7 +105,6 @@ void BVHApp_Application::drawApp(){
   ImGui::Render();
 
   glfwSwapBuffers(m_window);
-
 
   freshEditBuff();// reset the Viewport transform;
 
@@ -176,7 +176,6 @@ void BVHApp_Application::init(const char * fragShaderFile) {
     
   //Renderer Stuff
     app_BVHRenderer->initQuad();
-    app_BVHRenderer->bvh_program = m_program.m_glprogram;
    
 }
 

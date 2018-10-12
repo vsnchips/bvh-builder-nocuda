@@ -118,10 +118,8 @@ traceData tri( ray r, triangle t){
 void main() {
 
    vec3 comp;
-   
    comp = fragPosition;
   //  comp = vec3(0,0,1);
-
-    color = vec4(comp, 0.3);
+    color = vec4(comp, 0.6);
 
 }

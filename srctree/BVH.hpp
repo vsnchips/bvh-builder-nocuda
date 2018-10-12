@@ -59,6 +59,7 @@ struct BVHLeaf : BVHNode{
 
 ////////////////////////////////////////////////////////////////////////////////
 ///                               Main Host Side BVH Class                  ////
+
 class BVH{
 
   public:

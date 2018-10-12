@@ -8,9 +8,14 @@ void BVHRenderer::setLights(){}
 void BVHRenderer::updateEnvironment(){}
 void BVHRenderer::execute(){
 
-  if (glfwGetCurrentContext() != context) glfwMakeContextCurrent(context);
+  glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+  glEnable(GL_DEPTH_TEST);
+
+  /*if (glfwGetCurrentContext() != context) glfwMakeContextCurrent(context);
   GLint current; glGetIntegerv(GL_CURRENT_PROGRAM,&current);
-  if (current != bvh_program) glUseProgram(bvh_program);
+  if (current != bvh_program) glUseProgram(bvh_program);*/
+
+  glUseProgram(bvh_program);
  
   //
   glBindVertexArray(bvh_quad_vao);
