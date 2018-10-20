@@ -32,20 +32,6 @@ BVH_BBox::BVH_BBox(BVH_BBox * a, BVH_BBox * b){ //Constructs a new bounding box 
 //////////////////////////////////////////////
 /////// Functionality ///////////////////////
 //////////////////////////////////////////////
-void BVHNode::pick_partner(vector<BVHNode> & forest){
-
-  want = &(forest[0]);
-  BVH_BBox wantbox( &bb , &(want-> bb) );
-  float volume = wantbox.volume;
-
-    for ( BVHNode candidate : forest ){
-      BVH_BBox getBox( &bb , &candidate.bb );
-      if (getBox.volume < wantbox.volume){
-          wantbox = getBox;
-          want = &candidate;
-      }
-    }
-}
 
 void BVH_BBox::updateBasis(){
 

@@ -65,10 +65,12 @@ struct bufferPack{
 class BVHNode{
   public:
     int index;
+
     BVH_BBox bb; //the box it has - redundant for primitive nodes
     BVH_BBox wantbox; //the Box it wants to be a part of
-    void pick_partner(std::vector<BVHNode> & forest); //pick a candidate from the forest
+//    void pick_partner(std::vector<BVHNode> & forest); //pick a candidate from the forest
 
+    int want_headIndex = -1; //temp ptr valid during a pass
     BVHNode * want = nullptr;
     bool marked = false;
     bool sighted = false;
@@ -115,15 +117,16 @@ class BVH{
   public:
     void initBVH(); //sets up gl buffers
     std::vector<BVHLeaf> leaves;
-    std::vector<BVHNode> forest;
+    std::vector<BVHParentNode> parents;
     std::vector<BVHNode *> forest_ptrs;
+    std::vector<unsigned int> forestHeads; // This gets refreshed on each pass.
 
     //basic content
     bufferPack bvh_buffs;
     void clearbuffs();
 
     void clearScene(){
-      forest.clear();
+      parents.clear();
       leaves.clear();
     }
 
@@ -150,6 +153,12 @@ class BVH{
     //
     unsigned int bb_counter=0;
     void buildTopo();
+    
+    unsigned int nodeCount;
+    unsigned int lcount;
+    unsigned int pcount;
+    void countNodes();
+    BVHNode * fetchNode(unsigned int i);
 };
 
 ////////////////////////////////////////////////////////////////////////////////

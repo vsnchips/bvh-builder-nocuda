@@ -1,3 +1,4 @@
+
 #include "BVH.hpp"
 #include "cgra/mesh.hpp"
 
@@ -56,14 +57,28 @@ void BVH::clearbuffs(){
   bvh_buffs.topo.clear();
 }
 
+void BVH::countNodes(){
+  //check the leaf count
+   lcount = leaves.size();
+   pcount = parents.size();
+   nodeCount = lcount+pcount;
+}
+
+BVHNode * BVH::fetchNode(unsigned int i){
+ if (i>=lcount) return (BVHNode *) ( & (parents.at(i-lcount) ) );
+  else           return (BVHNode *) ( & (leaves.at(i) ) );
+  
+  return nullptr;
+}
 
 void BVH::buildTopo(){
 
+  clearScene();
   //Construct the trees
 
   //Put them in a forest
-  forest.clear();
 
+  // seems to work
   int forestCount = bvh_buffs.trispecs.size()/3;
   for (int i = 0; i < forestCount; i++){
     bvhTriangle nt;
@@ -79,98 +94,72 @@ void BVH::buildTopo(){
     newleaf.index = bb_counter;
     newleaf.bb.uniqueid = bb_counter++; 
 
-    forest.push_back(newleaf);
-    forest_ptrs.push_back( &(forest[forest.size()-1] ) );
+    leaves.push_back(newleaf);
   }
+    //^^think it works
 
-  // Structure the forest
+  ////// Structure the forest
+  ////
+  countNodes();
+  int headcount = lcount; //start with leaf amount of heads.
+  vector<unsigned int> heads;
+  for(int i=0; i< lcount; i++) heads.push_back(i);
+  //the head array is initialised to match the leaves.
+
+  //Rewrite !!!
   //
-  
-  forestCount = forest.size();
-  while (forestCount > 1){
-    cout << forestCount << " Trees in the forest \n";
-    forestCount = 0;
+  //Match finding stage, mutual mingling
+  while(headcount > 1){
+    //  get the length of the head array
+    for(int j = 0; j< headcount; j++) {
 
-    // Trees pick one another and propose
-    for(BVHNode * thistree : forest_ptrs){
-      thistree->sighted = true;
+      BVHNode * thisOne = fetchNode(heads[j]);
 
-      //Found an unpaired tree!
-      if(!(thistree->marked))
-      forestCount ++;
-      {
+      for(int i = 0; i< headcount; i++) {
+        if ( j != i ){ //Avoid self clash
 
-     for(int that = 0; that < forest.size(); that++){
-    // for(BVHNode * thattree : forest_ptrs){
-       BVHNode * thattree = forest_ptrs[that];
+          BVHNode * thatOne = fetchNode(heads[j]);
 
-       if (thistree != thattree ) 
-       {
-                 //Brute force for low-ish  poly test
-        if(thattree->want == thistree  &&  thattree->wantbox.volume>=0 && 
-           ((thattree->wantbox.volume < thistree->wantbox.volume)
-           || (thistree->wantbox.volume<0))
-           )
-        {
-          // tentatively accept the proposal, pending a better one.
-          //
-          thistree->wantbox = thattree->wantbox;
-          thistree->want = thattree;
-        
         }
-        else //No recieved proposal, test one.
-        {
-          //make a proposal!
-          //
-        BVH_BBox proposal = BVH_BBox(&(thistree->bb), &(thattree->bb));
-        //Increment the counter for every proposed BB!
-        proposal.uniqueid = bb_counter++; 
-        if (proposal.volume < thistree->wantbox.volume || thistree->wantbox.volume<0){
-          thistree->wantbox = proposal;
-          thistree->want = thattree;
-         }// end proposal assignment
-        }// agree or make fresh proposal
-       }// self ref check
-      }//end checking those trees
-      } // marked in earlier pass check
-    } //end checking these trees
-    //All the trees have picked their matches
+      }
+    }
 
-   
-    // Mark paired trees as children and add their parents
-    for(BVHNode  *thistree : forest_ptrs){
-      for(BVHNode  *thattree : forest_ptrs){
-       if (thistree != thattree){ //Brute force for low-ish  poly test
+//////// Match making stage. //////////////////
+///////
+///////Matchmaker registers mutual matches.
+// Unmatched nodes get pushed to the next round.
 
-         // Matching trees get:
-         if(thistree->want == thattree && thattree->want == thistree
-             &&
-             !(thistree->marked) && !(thattree->marked))
-         {
-           thistree->marked = true;
-           thattree->marked = true;
-           // put into parent nodes
-           BVHParentNode newParent = BVHParentNode( thistree, thattree );
-           // Parent node gets put into parent forest
-           forest.push_back(newParent);
-           forest_ptrs.push_back( &(forest[forest.size()-1] ) );
+//Only go through once.
+    unsigned int nextheadC = 0;
+    vector<unsigned int> next_heads;
+#define NUPARADD lcount+parents.size()-1
 
-          //Decrement the count
-          forestCount--;
+    for (int i=0 ; i< headcount; i++){
 
-         }// do we match?
-       }//self reference check
-      }//end those trees
-    }//end these trees
+      cout << "Headcount :" << headcount << " heads \n";
+      int A = i;
+      BVHNode * bvA = fetchNode(heads[A]);
+      int B = bvA -> want_headIndex;        //A wants B.
+      if (B>=0 && (!(bvA->marked))){// Already marked, or -1, do not want check
+        BVHNode * bvB = fetchNode(heads[B]);
 
-  }// end forest plurality
-  // The forest has been structured.
-
-  //now print the forest into a bb buffer and a topo buffer;
-  BVHNode * head = &(forest[0]);
-  head-> structure(-1);
-  clearbuffs();
-  head-> toBuffs(bvh_buffs);
-  bvh_buffs.headIndex = head-> index;
+        // Are they mutually matched?
+        if(bvB->want_headIndex == A){  
+          //Make a parent
+          BVHParentNode nuPar = BVHParentNode( bvA, bvB );
+          parents.push_back(nuPar);
+          next_heads.push_back(NUPARADD);
+          bvA->marked = true;
+          bvB->marked = true;
+        }
+        else{
+          //No match yet, push it to the next round.
+          next_heads.push_back(heads[A]);
+        }
+      }//end Marked, -1 dont want check
+    }
+    heads = next_heads;
+    headcount = heads.size();
+  } // Down to one head.
 
 }
