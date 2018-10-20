@@ -75,6 +75,9 @@ add_subdirectory(res) # Resources; for example shaders
 SET(sources
   #news
   #BVH.cpp
+  BVH_BBox.cpp 
+  BVH_Primitives.cpp 
+  #BVH_MeshLoad.cpp 
   submods/stringStreamConCat/vmpwStringStreamConcat.cpp
   BVHRenderer.hpp
   BVHRenderer.cpp

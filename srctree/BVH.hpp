@@ -13,57 +13,69 @@ struct bvh_ray{
   glm::vec3 r;
 };
 
-//Shared structs
-struct BVH_BBox{
-  glm::mat3 base;    //orientation
-  std::vector<glm::vec3> points[8];
+//Shared classs
+class BVH_BBox{
+   public:
+  glm::mat3 basis;    //orientation
+  void updateBasis();
+  std::vector<glm::vec3> points;
   glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
   float volume;
+  BVH_BBox(){}
   BVH_BBox(BVH_BBox * a, BVH_BBox * b);
 };
 
 //Prims
-struct bvhPrimitive{
-  virtual ~bvhPrimitive() {}
-  virtual BVH_BBox getBBox();
+class bvhPrimitive{
+   public:
+  virtual BVH_BBox getBBox(){ printf("bvhPrimitive base class' getBB called"); abort();}
   int matID;
   int index;
+  virtual ~bvhPrimitive(){}
 };
 
 
-struct bvhTriangle : bvhPrimitive{
+class bvhTriangle : public bvhPrimitive{
+   public:
   glm::vec3 pa, pb, pc;   //Points
   glm::vec3 na, nb, nc;   //Normals
   int matID;
   BVH_BBox getBBox(); //TODO:get the longest side as x, project it to the adjacent for y, set z to 0, there you go.
+  ~bvhTriangle(){}
 };
 
 //Nodes
-struct BVHNode{
+class BVHNode{
+   public:
   int m_id;
-  BVH_BBox bb;
-  virtual void updateBB(); 
-  BVHNode();
-  virtual ~BVHNode(){}
-  virtual void toBuffs();
+  BVH_BBox bb; //the box it has - redundant for primitive nodes
+  BVH_BBox wantbox; //the Box it wants to be a part of
+  void pick_partner(std::vector<BVHNode> & forest); //pick a candidate from the forest
 
   BVHNode * want = nullptr;
   bool marked = false;
 
+ // virtual void toBuffs();a
+  virtual ~BVHNode(){}
+
 };//base type
 
-struct BVHParentNode : BVHNode{
+class BVHParentNode : public BVHNode{
+   public:
   //optionally weight the tree, in a way that doesnt affect topology or emptiness maximization, but it may be useful to prefer checks against bigger volumes first.
   BVHNode largest;
   BVHNode smallest;
-  void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
-  BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative constructor
+  //void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
+  BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative conclassor
+  ~BVHParentNode(){}
 };
 
-struct BVHLeaf : BVHNode{
+class BVHLeaf : public BVHNode{
+  public:
   bvhPrimitive prim;
-  void updateBB(); //TODO: get a bbox from the primitive
+ // void updateBB(); //TODO: get a bbox from the primitive
   BVHLeaf(bvhPrimitive t) : prim(t){}
+  ~BVHLeaf(){}
 };
 
 struct bufferPack{
@@ -125,8 +137,8 @@ class BVH{
 //    HELPERS                           //
 int sendBVH(BVH & theBVH, GLFWwindow * ctx);
 
-float setVolume(std::vector<vec3> set);
-std::vector<glm::vec3> containing_set( std::vector<glm::vec3> & base, std::vector<glm::vec3> & target);
+float setVolume(std::vector<glm::vec3> set);
+std::vector<glm::vec3> containing_set( BVH_BBox * a, BVH_BBox * b);
 
 ////////////////////////////////////////////////////////////////////////////////
 
