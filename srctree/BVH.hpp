@@ -149,10 +149,9 @@ class BVH{
         std::vector<unsigned int> trispecs, int matID);
 
     //Building Functions
-    //  private:
-    //
-    unsigned int bb_counter=0;
+    unsigned int bb_counter=0; //bounding box count
     void buildTopo();
+    void createLeaves();
     
     unsigned int nodeCount;
     unsigned int lcount;

@@ -70,15 +70,8 @@ BVHNode * BVH::fetchNode(unsigned int i){
   
   return nullptr;
 }
+void BVH::createLeaves(){
 
-void BVH::buildTopo(){
-
-  clearScene();
-  //Construct the trees
-
-  //Put them in a forest
-
-  // seems to work
   int forestCount = bvh_buffs.trispecs.size()/3;
   for (int i = 0; i < forestCount; i++){
     bvhTriangle nt;
@@ -95,56 +88,99 @@ void BVH::buildTopo(){
     newleaf.bb.uniqueid = bb_counter++; 
 
     leaves.push_back(newleaf);
-  }
-    //^^think it works
+  }//End Buffer Filling
 
-  ////// Structure the forest
-  ////
+}
+
+void BVH::buildTopo(){
+
+  clearScene();
+  //Get the raw leaves
+  createLeaves();
+
+  //Put them in a forest
+  ////// Structure the forest /////
   countNodes();
   int headcount = lcount; //start with leaf amount of heads.
   vector<unsigned int> heads;
-  for(int i=0; i< lcount; i++) heads.push_back(i);
   //the head array is initialised to match the leaves.
+  for(int i=0; i< lcount; i++) heads.push_back(i);
+
 
   //Rewrite !!!
-  //
-  //Match finding stage, mutual mingling
-  while(headcount > 1){
-    //  get the length of the head array
+  
+  
+  while(headcount > 1){ 
+  //Plurality condition
+  cout << "Headcount :" << headcount << " heads \n";
+
+  //Match finding stage, mingling //////////////////
     for(int j = 0; j< headcount; j++) {
 
-      BVHNode * thisOne = fetchNode(heads[j]);
+      BVHNode * thisOne = fetchNode(heads[j]); //Activate Picker
+      // Forget about the last one!
+      thisOne->want = nullptr;
+      thisOne->wantbox.volume=-1;
 
       for(int i = 0; i< headcount; i++) {
         if ( j != i ){ //Avoid self clash
 
-          BVHNode * thatOne = fetchNode(heads[j]);
+          BVHNode * thatOne = fetchNode(heads[i]); //Get Candidate
+          // Try the match.
 
-        }
-      }
-    }
+          // Recieve a pitch
+          if(thatOne->want == thisOne){
+              //accept conditions
+              if(thisOne->wantbox.volume==-1 ||
+                thatOne->wantbox.volume <
+                thisOne->wantbox.volume) { 
+              thisOne->want = thatOne;
+              thisOne->wantbox = thatOne->wantbox;
+           }
+          }
+          else { // No pitch, try a pitch
+            BVH_BBox tryBoxA = BVH_BBox(&(thisOne->bb),&(thatOne->bb));
+            BVH_BBox tryBoxB = BVH_BBox(&(thatOne->bb),&(thisOne->bb));
 
-//////// Match making stage. //////////////////
-///////
-///////Matchmaker registers mutual matches.
-// Unmatched nodes get pushed to the next round.
+            //which one is better?
+            BVH_BBox betterBox = 
+              (tryBoxA.volume<tryBoxB.volume) ? tryBoxA : tryBoxB;
 
-//Only go through once.
+            if (betterBox.volume < thisOne->wantbox.volume ||
+                thisOne->wantbox.volume == -1) 
+              //Make the pitch.
+            { thisOne->wantbox = betterBox;
+              thisOne->want = thatOne; 
+            }
+          }//End new pitch case
+        }//selfclash check
+      }//inner loop
+    }// End mingling!
+
+    //////// Match making stage. //////////////////
+    ///////
+    ///////Matchmaker registers mutual matches.
+    // Unmatched nodes get pushed to the next round.
+
+    //Only go through once.
     unsigned int nextheadC = 0;
-    vector<unsigned int> next_heads;
-#define NUPARADD lcount+parents.size()-1
+    vector<unsigned int> next_heads; next_heads.clear();
+    #define NUPARADD lcount+parents.size()-1
 
-    for (int i=0 ; i< headcount; i++){
+    for (int i = 0 ; i < headcount; i++){
 
-      cout << "Headcount :" << headcount << " heads \n";
       int A = i;
       BVHNode * bvA = fetchNode(heads[A]);
       int B = bvA -> want_headIndex;        //A wants B.
-      if (B>=0 && (!(bvA->marked))){// Already marked, or -1, do not want check
-        BVHNode * bvB = fetchNode(heads[B]);
+
+      // Already marked
+      if (bvA->marked) continue;
+      //Every node wants a node. No nullptrs.
+        BVHNode * bvB = bvA-> want;
 
         // Are they mutually matched?
-        if(bvB->want_headIndex == A){  
+        //if(bvB->want_headIndex == A){  
+        if(bvB->want == bvA){  
           //Make a parent
           BVHParentNode nuPar = BVHParentNode( bvA, bvB );
           parents.push_back(nuPar);
@@ -152,14 +188,15 @@ void BVH::buildTopo(){
           bvA->marked = true;
           bvB->marked = true;
         }
-        else{
-          //No match yet, push it to the next round.
-          next_heads.push_back(heads[A]);
-        }
-      }//end Marked, -1 dont want check
+        //Neither marked, nor matched.
+        //push to next round.
+        else next_heads.push_back(heads[A]);
     }
+    
+    //End match making pass.
+    
     heads = next_heads;
     headcount = heads.size();
-  } // Down to one head.
 
+  } // Down to one head.
 }
