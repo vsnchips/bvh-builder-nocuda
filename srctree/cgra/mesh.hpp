@@ -12,6 +12,8 @@ namespace cgra {
 
     class Mesh {
         // Represents a single vertex in the mesh
+
+    public:
         struct Vertex {
             // The position of the vertex
             glm::vec3 m_position;
@@ -24,8 +26,6 @@ namespace cgra {
                 m_position(pos), m_normal(norm) { }
         };
 
-
-    public:
         // A list of all the vertices in the mesh
         std::vector<Vertex> m_vertices;
         // A list of indices into m_vertices.

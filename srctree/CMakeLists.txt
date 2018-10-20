@@ -77,7 +77,9 @@ SET(sources
   #BVH.cpp
   BVH_BBox.cpp 
   BVH_Primitives.cpp 
-  #BVH_MeshLoad.cpp 
+  BVH_MeshLoad.cpp
+  BVH_NodeCode.cpp
+  BVH_Sender.cpp 
   submods/stringStreamConCat/vmpwStringStreamConcat.cpp
   BVHRenderer.hpp
   BVHRenderer.cpp

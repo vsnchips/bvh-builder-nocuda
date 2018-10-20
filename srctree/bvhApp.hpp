@@ -57,6 +57,8 @@ public:
 
   // Loads and has graphical assets:
     void loadObj(const char *filename,cgra::Mesh &);
+    void mesh2BVH(cgra::Mesh &m);
+    void mesh2BVH(cgra::Mesh &m, glm::mat4 & translation, glm::mat4 & rotation);
     cgra::Mesh app_testmesh1;
     cgra::Mesh app_testmesh2;
  
@@ -89,7 +91,6 @@ public:
    
   //Has and operates a GUI
     void doGUI();
-
 
   //Maps interactions to stuff
     void onKey(int key, int scancode, int action, int mods);

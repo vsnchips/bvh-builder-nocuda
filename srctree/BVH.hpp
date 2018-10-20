@@ -15,80 +15,91 @@ struct bvh_ray{
 
 //Shared classs
 class BVH_BBox{
-   public:
-  glm::mat3 basis;    //orientation
-  void updateBasis();
-  std::vector<glm::vec3> points;
-  glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
-  float volume;
-  BVH_BBox(){}
-  BVH_BBox(BVH_BBox * a, BVH_BBox * b);
+  public:
+    glm::mat3 basis;    //orientation
+    void updateBasis();
+    std::vector<glm::vec3> points;
+    glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
+    float volume = -1;
+    BVH_BBox(){}
+    BVH_BBox(BVH_BBox * a, BVH_BBox * b);
+
+    unsigned int uniqueid;
 };
 
 //Prims
 class bvhPrimitive{
-   public:
-  virtual BVH_BBox getBBox(){ printf("bvhPrimitive base class' getBB called"); abort();}
-  int matID;
-  int index;
-  virtual ~bvhPrimitive(){}
+  public:
+    virtual BVH_BBox getBBox(){ printf("bvhPrimitive base class' getBB called"); abort();}
+    int matID;
+    int index;
+    virtual ~bvhPrimitive(){}
 };
-
 
 class bvhTriangle : public bvhPrimitive{
-   public:
-  glm::vec3 pa, pb, pc;   //Points
-  glm::vec3 na, nb, nc;   //Normals
-  int matID;
-  BVH_BBox getBBox(); //TODO:get the longest side as x, project it to the adjacent for y, set z to 0, there you go.
-  ~bvhTriangle(){}
-};
-
-//Nodes
-class BVHNode{
-   public:
-  int m_id;
-  BVH_BBox bb; //the box it has - redundant for primitive nodes
-  BVH_BBox wantbox; //the Box it wants to be a part of
-  void pick_partner(std::vector<BVHNode> & forest); //pick a candidate from the forest
-
-  BVHNode * want = nullptr;
-  bool marked = false;
-
- // virtual void toBuffs();a
-  virtual ~BVHNode(){}
-
-};//base type
-
-class BVHParentNode : public BVHNode{
-   public:
-  //optionally weight the tree, in a way that doesnt affect topology or emptiness maximization, but it may be useful to prefer checks against bigger volumes first.
-  BVHNode largest;
-  BVHNode smallest;
-  //void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
-  BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative conclassor
-  ~BVHParentNode(){}
-};
-
-class BVHLeaf : public BVHNode{
   public:
-  bvhPrimitive prim;
- // void updateBB(); //TODO: get a bbox from the primitive
-  BVHLeaf(bvhPrimitive t) : prim(t){}
-  ~BVHLeaf(){}
+    glm::vec3 pa, pb, pc;   //Points
+    glm::vec3 na, nb, nc;   //Normals
+    int matID;
+    BVH_BBox getBBox(); //get the longest side as x, project it to the adjacent for y, set z to 0, there you go.
+    ~bvhTriangle(){}
 };
+
 
 struct bufferPack{
   std::vector<glm::vec3> verts;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> uvs;
-  std::vector<int> tris;
+  std::vector<int> trispecs;
   std::vector<int> matIDs;
 
   std::vector<glm::vec3> bb_specs;
-  std::vector<glm::vec3> topo;
+  std::vector<int> topo;
 
   unsigned int headIndex;
+};
+
+//Nodes
+class BVHNode{
+  public:
+    int index;
+    BVH_BBox bb; //the box it has - redundant for primitive nodes
+    BVH_BBox wantbox; //the Box it wants to be a part of
+    void pick_partner(std::vector<BVHNode> & forest); //pick a candidate from the forest
+
+    BVHNode * want = nullptr;
+    bool marked = false;
+
+    virtual int structure(int p_id){printf("Called base class structure method"); abort();}
+    virtual int toBuffs(bufferPack & bp){printf("base class doesnt have a toBuffs"); abort();}
+    BVHNode(){}
+    virtual ~BVHNode(){}
+
+};//base type
+
+class BVHParentNode : public BVHNode{
+  public:
+    //optionally weight the tree, in a way that doesnt affect topology or emptiness maximization, but it may be useful to prefer checks against bigger volumes first.
+    BVHNode *largest;
+    BVHNode *smallest;
+    //void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
+    int toBuffs(bufferPack & bp);
+    int structure(int p_id);
+    BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative constructor
+    ~BVHParentNode(){}
+};
+
+class BVHLeaf : public BVHNode{
+  public:
+    bvhPrimitive prim;
+    // void updateBB(); //TODO: get a bbox from the primitive
+    int toBuffs(bufferPack & bp);
+    int structure(int p_id);
+    
+    BVHLeaf(bvhTriangle t) : prim(t){   //TODO: sort outhe the polymorphism here
+      bb = t.getBBox(); 
+    }
+    ~BVHLeaf(){}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,36 +110,43 @@ struct bufferPack{
 class BVH{
 
   public:
-  void initBVH(); //sets up gl buffers
-  std::vector<BVHLeaf> leaves;
-  std::vector<BVHNode> forest;
+    void initBVH(); //sets up gl buffers
+    std::vector<BVHLeaf> leaves;
+    std::vector<BVHNode> forest;
+    std::vector<BVHNode *> forest_ptrs;
 
-  //basic content
-  bufferPack bvh_buffs;
-  void clearbuffs();
-  
-  void clearScene(){
-    forest.clear();
-    leaves.clear();
-  }
+    //basic content
+    bufferPack bvh_buffs;
+    void clearbuffs();
 
-  //The BVH Class can manage its gl buffers and send stuff to them:
-  GLuint vertexbuff;
-  GLuint normalbuff;
-  GLuint uvbuff;
-  GLuint tribuff;
-  GLuint topobuff;
-  GLuint bb_buff;
+    void clearScene(){
+      forest.clear();
+      leaves.clear();
+    }
 
-  //Primitive Loading:
-  void addVerts(
-      std::vector<glm::vec3> points, std::vector<glm::vec2> uvs);
-  void addTris(
-      std::vector<unsigned int> trispecs, int matID);
+    //The BVH Class can manage its gl buffers and send stuff to them:
+    GLuint vertexbuff;
+    GLuint normalbuff;
+    GLuint uvbuff;
+    GLuint tribuff;
+    GLuint topobuff;
+    GLuint bb_buff;
 
-  //Building Functions
-  private:
-  void buildTopo();
+    //Primitive Loading:
+
+    void addData(std::vector<glm::vec3> & in_vp, 
+        std::vector<glm::vec3> & in_norm, std::vector<glm::vec2> & in_uvs, 
+        std::vector<unsigned int> & in_tris, glm::mat4 & t, glm::mat4 & r);
+    void addVerts(
+        std::vector<glm::vec3> points, std::vector<glm::vec2> uvs);
+    void addTris(
+        std::vector<unsigned int> trispecs, int matID);
+
+    //Building Functions
+    //  private:
+    //
+    unsigned int bb_counter=0;
+    void buildTopo();
 };
 
 ////////////////////////////////////////////////////////////////////////////////

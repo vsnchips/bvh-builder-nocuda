@@ -3,27 +3,6 @@
 using namespace std;
 using namespace glm;
 
-void BVHNode::pick_partner(vector<BVHNode> & forest){
-
-  want = &(forest[0]);
-  BVH_BBox wantbox( &bb , &(want-> bb) );
-  float volume = wantbox.volume;
-
-    for ( BVHNode candidate : forest ){
-      BVH_BBox getBox( &bb , &candidate.bb );
-      if (getBox.volume < wantbox.volume){
-          wantbox = getBox;
-          want = &candidate;
-      }
-    }
-}
-
-void BVH_BBox::updateBasis(){
-  basis[0] = points[1] - points[0]; //x axis
-  basis[1] = points[3] - points[0]; //y axis
-  basis[0] = points[4] - points[0]; //z axis
-}
-
 //////////////////////////////////////////////
 //Comparative Constructor//////////////////////
 //////////////////////////////////////////////
@@ -42,6 +21,35 @@ BVH_BBox::BVH_BBox(BVH_BBox * a, BVH_BBox * b){
 
   points = vol_a_has_b < vol_b_has_a ? prop_AhasB : prop_BhasA;   //
   volume = glm::min(vol_a_has_b,vol_b_has_a);
+}
+
+//////////////////////////////////////////////
+/////// Triangle Constructor /////////////////
+//////////////////////////////////////////////
+
+
+//////////////////////////////////////////////
+/////// Functionality ///////////////////////
+//////////////////////////////////////////////
+void BVHNode::pick_partner(vector<BVHNode> & forest){
+
+  want = &(forest[0]);
+  BVH_BBox wantbox( &bb , &(want-> bb) );
+  float volume = wantbox.volume;
+
+    for ( BVHNode candidate : forest ){
+      BVH_BBox getBox( &bb , &candidate.bb );
+      if (getBox.volume < wantbox.volume){
+          wantbox = getBox;
+          want = &candidate;
+      }
+    }
+}
+
+void BVH_BBox::updateBasis(){
+  basis[0] = points[1] - points[0]; //x axis
+  basis[1] = points[3] - points[0]; //y axis
+  basis[2] = points[4] - points[0]; //z axis
 }
 
 

@@ -90,6 +90,37 @@ void BVHApp_Application::loadObj(const char *filename,cgra::Mesh &targetMesh) {
 
 }
 
+void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh){
+  mat4 id(1.0);
+  mesh2BVH(inMesh, id, id);
+}
+
+void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh, mat4 & translation, mat4 & rotation){
+ 
+  //get verts in an array
+  vector<vec3> vs_in;
+  for( cgra::Mesh::Vertex v: inMesh.m_vertices ){
+    vs_in.push_back(v.m_position);
+  }
+
+  //get normals in an array
+  vector<vec3> ns_in;
+  for(cgra::Mesh::Vertex v: inMesh.m_vertices ){
+    ns_in.push_back(v.m_normal);
+  }
+
+  //get uvs in an array
+  vector<vec2> uvs_in;
+  for( cgra::Mesh::Vertex cv: inMesh.m_vertices ){
+    uvs_in.push_back( vec2(1.0));  //no uvs on these meshes yet
+  }
+
+
+  vector<vec2> dummyUV;
+  theBVH.addData(vs_in, ns_in, dummyUV, inMesh.m_indices, translation, rotation);
+
+}
+
 void BVHApp_Application::drawApp(){
   //Refresh viewport 
   glfwMakeContextCurrent(m_window);
@@ -162,9 +193,9 @@ void BVHApp_Application::init(const char * fragShaderFile) {
     m_translation.z=-2.0f;
 
     //Load the objs;
-    loadObj("res/models/sphere.obj",app_testmesh1);
+    loadObj("../srctree/res/models/sphere.obj",app_testmesh1);
   gl_errorFlush("sphere");
-    loadObj("res/models/bunny.obj",app_testmesh2);
+    loadObj("../srctree/res/models/bunny.obj",app_testmesh2);
   gl_errorFlush("bunny");
 
   //Shader tracking stuff

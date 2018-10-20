@@ -4,84 +4,52 @@
 using namespace glm;
 using namespace std;
 
-int BVHParentNode::structure(int p_id){
-  //Depth first traversal  
-  int sid = smallest.structure(p_id);
-  int bid = biggest.structure(  sid);
-  m_id = bid + 1;                        //Head last;
-  return m_id;
+void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & in_uvs, 
 
-}
+    vector<unsigned int> & in_tris, mat4 & translation, mat4 & rotation){
+  for (vec3 v : in_vp){
+    vec4 v4p = vec4(
+        v.x, v.y, v.z, 1.0
+      );
 
-int BVHLeaf::structure(int p_id){
-  //Depth first traversal  
-  m_id = p_id + 1;                        //Head last;
-  return m_id;
-}
-
-int BVHParentNode::toBuffs(bufferPack * bp){
-
-  //Depth first traversal  
-  smallest.toBuffs(bp); 
-  biggest.toBuffs(bp);
-
-  //post
-  bp.topo.push_back(smallest.index);
-  bp.topo.push_back( biggest.index);
-
-  bp.bb_specs.push_back( bb.origin  ); 
-  bp.bb_specs.push_back( bb.base[0] ); 
-  bp.bb_specs.push_back( bb.base[1] ); 
-  bp.bb_specs.push_back( bb.base[2] ); 
-
-  return (bp.topo.size()/2);
-
-} 
-
-int BVHLeaf::toBuffs(bufferPack * bp){
-  bp.topo.push_back(-1);
-  bp.topo.push_back( prim.index );
-  return bp.topo.size()/2;
-} 
+/*    v4p = translation*rotation*v4p;
+    vec3 v3t = vec3(v4p.x,v4p.y,v4p.z);
 
 
-void addMesh(cgra::Mesh inMesh, mat4 translation, mat4 rotation){
+    v4p = translation*rotation*v4p;
+    vec3 v3t = vec3(v4p.x,v4p.y,v4p.z);
+    bvh_buffs.verts.push_back(v3t);*/ 
+    bvh_buffs.verts.push_back(v); 
+  }
+ 
+  for (vec3 n : in_norm){
 
-  //get verts in an array
-  vector<vec3> vs_in;
-  for( Vertex v: inMesh.m_vertices ){
-    vs_in.push_back(v.m_position);
+    vec4 n4p = vec4(
+        n.x, n.y, n.z, 1.0
+        );
+/*
+    n4p = rotation*n4p;
+    vec3 n3t = vec3(n4p.x,n4p.y,n4p.z);
+    bvh_buffs.normals.push_back(normalize(n3t));*/ 
+    bvh_buffs.normals.push_back(normalize(n)); 
+  }
+ 
+  for (vec2 uv : in_uvs){
+    bvh_buffs.uvs.push_back(uv); 
   }
 
-  //get normals in an array
-  vector<vec3> ns_in;
-  for( Vertex v: inMesh.m_vertices ){
-    ns_in.push_back(v.m_normal);
+  // Fill out the  primitive vectors
+  for (unsigned int i :in_tris){
+    bvh_buffs.trispecs.push_back(i); 
   }
-
-  //get normals in an array
-  vector<vec3> uvs_in;
-  for( Vertex v: inMesh.m_vertices ){
-    uvs_in.push_back(v.m_normal);
-  }
-
-
-  for (vec3 v : vs_in){
-    verts.push_back(translation*rotation*v); 
-  }
-  for (vec3 n : ns_in){
-    normals.push_back(normalize(rotation*gn)); 
-  }
-  for (vec2 uv : uvs_in){
-    uvs.push_back(uv); 
-  }
+ 
 }
 
 void BVH::clearbuffs(){
   bvh_buffs.verts.clear();
   bvh_buffs.normals.clear();
   bvh_buffs.uvs.clear();
-  bvh_buffs.tris.clear();
+  bvh_buffs.trispecs.clear();
   bvh_buffs.matIDs.clear();
 
   bvh_buffs.bb_specs.clear();
@@ -96,43 +64,100 @@ void BVH::buildTopo(){
   //Put them in a forest
   forest.clear();
 
-  int forestCount = tris.size()/3;
+  int forestCount = bvh_buffs.trispecs.size()/3;
   for (int i = 0; i < forestCount; i++){
-    bvhPrimitive nt;
+    bvhTriangle nt;
 
-    nt.pa = verts[ tris[i*3]];
-    nt.pa = verts[ tris[i*3+1]];
-    nt.pa = verts[ tris[i*3+2]];
+    nt.pa = bvh_buffs.verts[ bvh_buffs.trispecs[i*3] ];
+    nt.pb = bvh_buffs.verts[ bvh_buffs.trispecs[i*3+1] ];
+    nt.pc = bvh_buffs.verts[ bvh_buffs.trispecs[i*3+2] ];
 
     nt.index = i;
 
-    forest.push_back(BVHLeaf(nt));
+    //add the leaf
+    BVHLeaf newleaf= BVHLeaf(nt);
+    newleaf.bb.uniqueid = bb_counter++; 
+
+    forest.push_back(newleaf);
+    forest_ptrs.push_back( &(forest[forest.size()-1] ) );
   }
 
   // Structure the forest
   //
-  vector<BVHNode>nextForest; nextForest.clear();
-  while (forestCount > 0){
+  
+  forestCount = forest.size();
+  while (forestCount > 1){
+    cout << forestCount << " Trees in the forest \n";
+    forestCount = 0;
 
     // Trees pick one another and propose
-    for(BVHNode tree : forest){}
-    // Matching trees get:
-    for(BVHNode tree : forest){
-      // put into parent nodes
-      // 
-      // Parent node gets put into parent forest
-      //
-      //
-    }
+    for(BVHNode * thistree : forest_ptrs){
 
-    forest = nextForest;
-  }
+     for(BVHNode * thattree : forest_ptrs){
+       if (thistree != thattree 
+           &&
+           !(thistree->marked)) //instead of copying, mark the enclosed nodes, skip them.
+       {
+         //Found an unpaired tree!
+        forestCount ++;
+
+         //Brute force for low-ish  poly test
+        if(thattree->want == thistree  &&  (thattree->wantbox.volume < thistree->wantbox.volume || thistree->wantbox.volume<0) ){  // tentatively match the likes
+          thistree->wantbox = thattree->wantbox;
+          thistree->want = thattree;
+        }
+        else //No recieved proposal, test one.
+        {
+          //make a proposal!
+          //
+        BVH_BBox proposal = BVH_BBox(&(thistree->bb), &(thattree->bb));
+        //Increment the counter for every proposed BB!
+        proposal.uniqueid = bb_counter++; 
+        if (proposal.volume < thistree->wantbox.volume || thistree->wantbox.volume<0){
+          thistree->wantbox = proposal;
+          thistree->want = thattree;
+         }// end proposal assignment
+        }// agree or make fresh proposal
+       }//mark check (was it novel?)
+      }//end checking those trees
+    } //end checking these trees
+    //All the trees have picked their matches
+
+   
+    // Mark paired trees as children and add their parents
+    for(BVHNode  *thistree : forest_ptrs){
+      for(BVHNode  *thattree : forest_ptrs){
+       if (thistree != thattree){ //Brute force for low-ish  poly test
+
+         // Matching trees get:
+         if(thistree->want == thattree && thattree->want == thistree
+             &&
+             !(thistree->marked) && !(thattree->marked))
+         {
+           thistree->marked = true;
+           thattree->marked = true;
+           // put into parent nodes
+           BVHParentNode newParent = BVHParentNode( thistree, thattree );
+           // Parent node gets put into parent forest
+           forest.push_back(newParent);
+           forest_ptrs.push_back( &(forest[forest.size()-1] ) );
+
+          //Decrement the ceunt
+          forestCount--;
+
+         }// do we match?
+       }//self reference check
+      }//end those trees
+    }//end these trees
+
+  }// end forest plurality
+  // The forest has been structured.
 
   //now print the forest into a bb buffer and a topo buffer;
   BVHNode * head = &(forest[0]);
   head-> structure(-1);
   clearbuffs();
-  head-> tobuffs(bvh_buffs);
-  bvh_buffs.headIndex = head-> m_id;
+  head-> toBuffs(bvh_buffs);
+  bvh_buffs.headIndex = head-> index;
 
 }
