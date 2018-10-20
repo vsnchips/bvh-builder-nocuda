@@ -52,6 +52,8 @@ public:
 
   // Has a BVH Maker/Maintainer
     BVH theBVH;
+  // Sends bvhs to the gpu:
+    void sendBuffs();
 
   // Loads and has graphical assets:
     void loadObj(const char *filename,cgra::Mesh &);

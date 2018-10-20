@@ -29,6 +29,3 @@ class BVHRenderer{
 };
 
 //End header 
-
-
-

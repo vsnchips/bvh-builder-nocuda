@@ -18,6 +18,8 @@ namespace cgra {
             // The normal at the vertex
             glm::vec3 m_normal;
 
+            glm::vec2 m_uv;
+
             Vertex(glm::vec3 pos, glm::vec3 norm) :
                 m_position(pos), m_normal(norm) { }
         };

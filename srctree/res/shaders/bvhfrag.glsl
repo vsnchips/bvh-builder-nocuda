@@ -4,8 +4,90 @@
 in vec3 fragPosition;
 in vec3 fragNormal;
 
+uniform mat4 viewMat;
+uniform mat4 projectionMat; //might not use.. 
+
+layout(std430, binding = 2) buffer vertbuff
+{
+  vec3 points[];
+};
+layout(std430, binding = 3) buffer normalbuff
+{
+  vec3 normals[];
+};
+layout(std430, binding = 4) buffer uvbuff
+{
+  vec2 uvs[];
+};
+layout(std430, binding = 5) buffer tribuff
+{
+  int tris[];
+};
+layout(std430, binding = 6) buffer topobuff
+{
+  int headNode;
+  int topo[];
+};
+layout(std430, binding = 7) buffer bbsbuff
+{
+  vec3 bbs[];
+};
+
+//Switches, single element uniforms
+const bool previewBBs = true;
 //layout (location = 0)
-  
+//Test Buffers
+
+
+/*/The BVH Sends shader storage buffers of:
+
+  Vertices
+  Normals
+  MATids
+  primIdentifiers // for development
+  Triangle Specs
+
+  BVH Pointer Tree
+
+  Theses buffers all have associated:
+  uniform int count;
+
+ */
+
+//Test Buffers:
+const vec3 test_vertices[18] = vec3[]
+(
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0),
+ vec3(0.0,0.0,0.0)
+ );
+
+const int test_indices[18] = int[]
+(
+ 0,1,2,
+ 3,4,5,
+ 6,7,8,
+ 9,10,11,
+ 12,13,14,
+ 15,16,17
+ );
+
+
 out vec4 color;
 
 //Lighting Regular Constants
@@ -14,9 +96,6 @@ const vec3 ambientColor = vec3(0.3, 0.3, 0.3);
 const vec3 diffuseColor = vec3(0.4, 0.4, 1.0);
 const vec3 specColor    = vec3(0.2, 0.1, 0.1);
 const float shininess = 16.0;
-
-uniform mat4 viewMat;
-uniform mat4 projectionMat; //might not use.. 
 
 #define rot2(X) mat2(cos(X), -sin(X), sin(X), cos(X))
 
@@ -29,6 +108,8 @@ struct traceData{
   int matID;
   vec2 uv;
 }escape;
+
+traceData ESCAPE = traceData(false, vec3(0), vec3(0), vec3(0), -1, -1, vec2(0));
 
 struct triangle{
   vec3 pa;
@@ -58,9 +139,7 @@ struct bvhElement{
 };
 //Test Data
 
- triangle testPrims[4];
-
-
+triangle testPrims[4];
 
 bvhElement lookUpBVH(){
   bvhElement ret;
@@ -114,9 +193,85 @@ traceData tri( ray r, triangle t){
 }
 
 
+bool testBB(int i){
+  return true;
+}
 
+/*
+traceData closeHit(){
+
+  traceData close;
+  close
+
+#define MAX_VISIT_STACK 128
+int vstack[MAX_VISIT_STACK];
+int si = 0; // stack index;
+
+while(si>=0){
+
+  if(te){
+    if(){
+    }
+    else{
+    }
+  }else{
+  }
+
+
+}
+
+return close;
+}
+*/
+
+traceData bvhTrace(ray r){
+  traceData close = ESCAPE;
+ 
+  #define MAX_STACK 128
+  int vstack[MAX_STACK];
+  int si = 0;
+  
+  while( si >= 0)
+
+
+  return close;
+
+}
 void main() {
 
+   vec3 camera_p = vec3(0,0,0);
+   ray camera_ray;
+   camera_ray.d = normalize(vec3(fragPosition.xy,0));
+   camera_ray.p = camera_p;
+
+   //Here goes some tracing
+
+   //No distance functions to get the normals. They must be interpolated from the triangles barycentrically.
+
+   // For all lights
+//   traceData 
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   
    vec3 comp;
    comp = fragPosition;
   //  comp = vec3(0,0,1);
