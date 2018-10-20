@@ -7,10 +7,9 @@ using namespace glm;
 //Comparative Constructor//////////////////////
 //////////////////////////////////////////////
 
-BVH_BBox::BVH_BBox(BVH_BBox * a, BVH_BBox * b){
 
-  a->updateBasis();
-  b->updateBasis();
+BVH_BBox::BVH_BBox(BVH_BBox * a, BVH_BBox * b){ //Constructs a new bounding box that minimally encloses two child boxes.
+
   //consume b in a
   float volacb;//result
   vector<vec3> prop_AhasB = containing_set(a, b);
@@ -20,7 +19,9 @@ BVH_BBox::BVH_BBox(BVH_BBox * a, BVH_BBox * b){
   float vol_b_has_a = setVolume( prop_AhasB );
 
   points = vol_a_has_b < vol_b_has_a ? prop_AhasB : prop_BhasA;   //
+  updateBasis();
   volume = glm::min(vol_a_has_b,vol_b_has_a);
+  isPrim = 0;
 }
 
 //////////////////////////////////////////////
@@ -47,6 +48,7 @@ void BVHNode::pick_partner(vector<BVHNode> & forest){
 }
 
 void BVH_BBox::updateBasis(){
+
   basis[0] = points[1] - points[0]; //x axis
   basis[1] = points[3] - points[0]; //y axis
   basis[2] = points[4] - points[0]; //z axis

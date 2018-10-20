@@ -21,10 +21,12 @@ class BVH_BBox{
     std::vector<glm::vec3> points;
     glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
     float volume = -1;
+
+    int isPrim = -1;
+    unsigned int uniqueid;
+    
     BVH_BBox(){}
     BVH_BBox(BVH_BBox * a, BVH_BBox * b);
-
-    unsigned int uniqueid;
 };
 
 //Prims
@@ -69,6 +71,7 @@ class BVHNode{
 
     BVHNode * want = nullptr;
     bool marked = false;
+    bool sighted = false;
 
     virtual int structure(int p_id){printf("Called base class structure method"); abort();}
     virtual int toBuffs(bufferPack & bp){printf("base class doesnt have a toBuffs"); abort();}

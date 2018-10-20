@@ -26,6 +26,8 @@ newbb.points.push_back(pa + zb + xb);
 newbb.points.push_back(pa + zb + xb + yb);
 newbb.points.push_back(pa + zb + yb);
 
+newbb.updateBasis();
+newbb.isPrim = 1;
 return newbb;
 
 }

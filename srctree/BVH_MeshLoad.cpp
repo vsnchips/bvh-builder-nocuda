@@ -76,6 +76,7 @@ void BVH::buildTopo(){
 
     //add the leaf
     BVHLeaf newleaf= BVHLeaf(nt);
+    newleaf.index = bb_counter;
     newleaf.bb.uniqueid = bb_counter++; 
 
     forest.push_back(newleaf);
@@ -92,19 +93,30 @@ void BVH::buildTopo(){
 
     // Trees pick one another and propose
     for(BVHNode * thistree : forest_ptrs){
+      thistree->sighted = true;
 
-     for(BVHNode * thattree : forest_ptrs){
-       if (thistree != thattree 
-           &&
-           !(thistree->marked)) //instead of copying, mark the enclosed nodes, skip them.
+      //Found an unpaired tree!
+      if(!(thistree->marked))
+      forestCount ++;
+      {
+
+     for(int that = 0; that < forest.size(); that++){
+    // for(BVHNode * thattree : forest_ptrs){
+       BVHNode * thattree = forest_ptrs[that];
+
+       if (thistree != thattree ) 
        {
-         //Found an unpaired tree!
-        forestCount ++;
-
-         //Brute force for low-ish  poly test
-        if(thattree->want == thistree  &&  (thattree->wantbox.volume < thistree->wantbox.volume || thistree->wantbox.volume<0) ){  // tentatively match the likes
+                 //Brute force for low-ish  poly test
+        if(thattree->want == thistree  &&  thattree->wantbox.volume>=0 && 
+           ((thattree->wantbox.volume < thistree->wantbox.volume)
+           || (thistree->wantbox.volume<0))
+           )
+        {
+          // tentatively accept the proposal, pending a better one.
+          //
           thistree->wantbox = thattree->wantbox;
           thistree->want = thattree;
+        
         }
         else //No recieved proposal, test one.
         {
@@ -118,8 +130,9 @@ void BVH::buildTopo(){
           thistree->want = thattree;
          }// end proposal assignment
         }// agree or make fresh proposal
-       }//mark check (was it novel?)
+       }// self ref check
       }//end checking those trees
+      } // marked in earlier pass check
     } //end checking these trees
     //All the trees have picked their matches
 
@@ -142,7 +155,7 @@ void BVH::buildTopo(){
            forest.push_back(newParent);
            forest_ptrs.push_back( &(forest[forest.size()-1] ) );
 
-          //Decrement the ceunt
+          //Decrement the count
           forestCount--;
 
          }// do we match?
