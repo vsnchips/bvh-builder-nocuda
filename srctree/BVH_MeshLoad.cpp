@@ -65,10 +65,11 @@ void BVH::countNodes(){
 }
 
 BVHNode * BVH::fetchNode(unsigned int i){
- if (i>=lcount) return (BVHNode *) ( & (parents.at(i-lcount) ) );
-  else           return (BVHNode *) ( & (leaves.at(i) ) );
+ if (i>=leaves.size()) return ( & (parents.at(i-leaves.size()) ) );
+ //if (i>=lcount) return (BVHNode *) ( & (parents.at(i-lcount) ) );
+  //else          return (BVHNode *) ( & (leaves.at(i) ) );
+ return ( & (leaves.at(i) ) );
   
-  return nullptr;
 }
 void BVH::createLeaves(){
 
@@ -108,7 +109,26 @@ void BVH::buildTopo(){
 
 
   //Rewrite !!!
-  
+ 
+  //Get Absolute bounding box:
+  vec3 low;
+  vec3 high;
+  low=high=bvh_buffs.verts[0];
+  for(vec3 p :bvh_buffs.verts){
+    low=glm::min(p,low);
+    high=glm::max(p,high);
+  }
+  float size = length(high-low);
+  cout << "Bonding Box span" << size << "\n";
+  cout << "lowx" << low.x << "\n";
+  cout << "lowy" << low.y << "\n";
+  cout << "lowz" << low.z << "\n";
+  cout << "highx" << high.x << "\n";
+  cout << "highy" << high.y << "\n";
+  cout << "highz" << high.z << "\n";
+  //Time for a dirty improvement of a dirty sorter without using 
+  //parallelism:
+  //Check neighbors within a certain distance
   
   while(headcount > 1){ 
   //Plurality condition
@@ -165,19 +185,17 @@ void BVH::buildTopo(){
     //Only go through once.
     unsigned int nextheadC = 0;
     vector<unsigned int> next_heads; next_heads.clear();
-    #define NUPARADD lcount+parents.size()-1
+    #define NUPARADD leaves.size()-1+parents.size()
 
     for (int i = 0 ; i < headcount; i++){
 
-      int A = i;
-      BVHNode * bvA = fetchNode(heads[A]);
-      int B = bvA -> want_headIndex;        //A wants B.
+      BVHNode * bvA = fetchNode(heads[i]);
 
       // Already marked
-      if (bvA->marked) continue;
+      if ((bvA->marked)==true) continue;
       //Every node wants a node. No nullptrs.
         BVHNode * bvB = bvA-> want;
-
+      //if (bvB->marked) continue;
         // Are they mutually matched?
         //if(bvB->want_headIndex == A){  
         if(bvB->want == bvA){  
@@ -188,15 +206,25 @@ void BVH::buildTopo(){
           bvA->marked = true;
           bvB->marked = true;
         }
+        
         //Neither marked, nor matched.
         //push to next round.
-        else next_heads.push_back(heads[A]);
+        else next_heads.push_back(heads[i]);
     }
     
     //End match making pass.
     
+    heads.clear();
     heads = next_heads;
     headcount = heads.size();
 
   } // Down to one head.
+
+
+    //Now print the spec buffers
+    fetchNode(heads[0]) -> structure(-1);
+    fetchNode(heads[0]) -> toBuffs(& bvh_buffs );
+
+    
+    
 }
