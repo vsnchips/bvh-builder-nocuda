@@ -80,7 +80,6 @@ class BVHNode{
     virtual int structure(int p_id){std::cout << "Called base class structure method\n"; return 0;}
       //abort();}
     virtual int toBuffs(bufferPack * bp){std::cout << "base class doesnt have a toBuffs\n"; abort(); return 0;}
-    BVHNode(){}
     virtual ~BVHNode(){}
 
 };//base type
@@ -91,8 +90,10 @@ class BVHParentNode : public BVHNode{
     BVHNode *largest;
     BVHNode *smallest;
     //void updateBB(); //TODO:check bounding boxes of children. Copy the bbox of the bigger one, and extend it to include both.
-    int toBuffs(bufferPack * bp);
-    int structure(int p_id);
+//    int toBuffs(bufferPack * bp);
+    int parent_toBuffs(bufferPack * bp);
+//    int structure(int p_id);
+    int par_structure(int p_id);
     BVHParentNode(BVHNode * a, BVHNode * b); //TODO:comparative constructor
     ~BVHParentNode(){}
 };
@@ -101,8 +102,10 @@ class BVHLeaf : public BVHNode{
   public:
     bvhPrimitive prim;
     // void updateBB(); //TODO: get a bbox from the primitive
-    int toBuffs(bufferPack * bp);
-    int structure(int p_id);
+//    int toBuffs(bufferPack * bp);
+    int leaf_toBuffs(bufferPack * bp);
+//    int structure(int p_id);
+    int leaf_structure(int p_id);
     
     BVHLeaf(bvhTriangle & t);
     ~BVHLeaf(){}

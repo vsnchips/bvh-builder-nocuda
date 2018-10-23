@@ -183,9 +183,9 @@ void BVH::buildTopo(){
     // Unmatched nodes get pushed to the next round.
 
     //Only go through once.
-    unsigned int nextheadC = 0;
     vector<unsigned int> next_heads; next_heads.clear();
-    #define NUPARADD leaves.size()-1+parents.size()
+    
+#define NUPARADD leaves.size() -1 +parents.size()
 
     for (int i = 0 ; i < headcount; i++){
 
@@ -202,7 +202,7 @@ void BVH::buildTopo(){
           //Make a parent
           BVHParentNode nuPar = BVHParentNode( bvA, bvB );
           parents.push_back(nuPar);
-          next_heads.push_back(NUPARADD);
+          next_heads.push_back( NUPARADD );
           bvA->marked = true;
           bvB->marked = true;
         }
@@ -222,8 +222,8 @@ void BVH::buildTopo(){
 
 
     //Now print the spec buffers
-    fetchNode(heads[0]) -> structure(-1);
-    fetchNode(heads[0]) -> toBuffs(& bvh_buffs );
+    dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> par_structure(-1);
+    dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> parent_toBuffs( & bvh_buffs );
 
     
     
