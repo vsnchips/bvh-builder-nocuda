@@ -73,7 +73,9 @@ BVHNode * BVH::fetchNode(unsigned int i){
 }
 void BVH::createLeaves(){
 
-  int forestCount = bvh_buffs.trispecs.size()/3;
+  //int forestCount = bvh_buffs.trispecs.size()/3;
+  int forestCount = 20;
+
   for (int i = 0; i < forestCount; i++){
     bvhTriangle nt;
 
@@ -89,6 +91,8 @@ void BVH::createLeaves(){
     newleaf.bb.uniqueid = bb_counter++; 
 
     leaves.push_back(newleaf);
+    cout << "created leaf " << leaves[i].index << "\n";
+
   }//End Buffer Filling
 
 }
@@ -132,10 +136,10 @@ void BVH::buildTopo(){
   
   while(headcount > 1){ 
   //Plurality condition
-  cout << "Headcount :" << headcount << " heads \n";
+  cout << "\nNEW PASS Headcount :" << headcount << " heads \n";
 
   //Match finding stage, mingling //////////////////
-    for(int j = 0; j< headcount; j++) {
+    for(int j = 0; j < headcount; j++) {
 
       BVHNode * thisOne = fetchNode(heads[j]); //Activate Picker
       // Forget about the last one!
@@ -200,8 +204,25 @@ void BVH::buildTopo(){
         //if(bvB->want_headIndex == A){  
         if(bvB->want == bvA){  
           //Make a parent
+          
+          // Debug print
+          printf("Making new parent from:\n\
+              node %d\n\
+              node %d\n", bvA->index, bvB->index);
+
           BVHParentNode nuPar = BVHParentNode( bvA, bvB );
+
+          //Index iteration
+          nuPar.index = NUPARADD;
+
+          bvA->parcount = bvA->parcount+1;
+          bvB->parcount = bvB->parcount+1;
+
+          if(bvA->parcount > 1) cout << "OOPS! Node " << bvA->index << " has " << bvA->parcount << " parents!\n";
+
           parents.push_back(nuPar);
+          cout << "There are now this many parents: " << parents.size() <<"\n";
+
           next_heads.push_back( NUPARADD );
           bvA->marked = true;
           bvB->marked = true;
@@ -209,22 +230,21 @@ void BVH::buildTopo(){
         
         //Neither marked, nor matched.
         //push to next round.
-        else next_heads.push_back(heads[i]);
+        else{ next_heads.push_back(heads[i]);
+          cout << "No match, push this head to the next round. \n";
+          cout << next_heads.size() << " Heads next round, at least\n";
+        }
     }
     
     //End match making pass.
     
-    heads.clear();
     heads = next_heads;
     headcount = heads.size();
 
   } // Down to one head.
 
-
     //Now print the spec buffers
     dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> par_structure(-1);
     dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> parent_toBuffs( & bvh_buffs );
 
-    
-    
 }

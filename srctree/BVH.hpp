@@ -77,6 +77,8 @@ class BVHNode{
   
     int type = -1;
 
+    int parcount = 0; // should never be more than one!!
+
     virtual int structure(int p_id){std::cout << "Called base class structure method\n"; return 0;}
       //abort();}
     virtual int toBuffs(bufferPack * bp){std::cout << "base class doesnt have a toBuffs\n"; abort(); return 0;}

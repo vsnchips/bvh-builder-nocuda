@@ -1,4 +1,3 @@
-//version 150 core
 #version 430 core
 
 in vec3 fragPosition;
@@ -272,9 +271,13 @@ void main() {
    
    
    
-   vec3 comp;
-   comp = fragPosition;
+  vec3 comp;
+  comp = fragPosition* 0.3;
   //  comp = vec3(0,0,1);
-    color = vec4(comp, 0.6);
+
+  comp.b = points[0].r;
+  comp.b = normals[2].r;
+
+  color = vec4(comp, 0.6);
 
 }

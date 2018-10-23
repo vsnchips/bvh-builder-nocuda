@@ -45,10 +45,14 @@ public:
     void reloadShader(const char *);
     void reloadShader();
     std::vector<std::string> app_shaderFilenames;
+    std::vector<std::string> app_compshaderFilenames;
+    vmpwStringStreamConcat * compShaderStream;
     vmpwStringStreamConcat * shaderStream;
     const char * fragShaderPath;
-    // The shader program used for drawing
+    const char * compShaderPath;
+    // The shader programs
     cgra::Program m_program;
+    GLuint compshader;
 
   // Has a BVH Maker/Maintainer
     BVH theBVH;
@@ -125,7 +129,7 @@ public:
     }
    
   //Post construction initialisation
-    void init(const char *);
+    void init(const char *, const char *);
 
 };
 

@@ -9,8 +9,11 @@ class BVHRenderer{
   public:
   GLFWwindow * context;
   
-  GLuint bvh_program;
-  
+  GLuint bvh_comp_program;
+  GLuint ssbo_bbs;
+
+  GLuint bvh_frag_program;
+
   GLuint bvh_quad_vao;
   GLuint bvh_quad_vbo;
   GLuint bvh_quad_ibo;

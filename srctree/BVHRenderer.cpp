@@ -15,7 +15,7 @@ void BVHRenderer::execute(){
   GLint current; glGetIntegerv(GL_CURRENT_PROGRAM,&current);
   if (current != bvh_program) glUseProgram(bvh_program);*/
 
-  glUseProgram(bvh_program);
+  glUseProgram(bvh_frag_program);
  
   //
   glBindVertexArray(bvh_quad_vao);

@@ -4,9 +4,25 @@ using namespace std;
 using namespace glm;
 
 void BVHApp_Application::updateScene(clock_t nt) {
-  
+
+  //Check Changes to the comp shader 
+  if(compShaderStream->update(nt)){ 
+    printf("Change In comp shader detected! \n");
+    compShaderPath = compShaderStream->filenames->at(0).c_str(); 
+    reloadShader(); 
+
+    //Run the comp shader, too
+    glUseProgram(compshader);
+    glDispatchCompute(1,1,1);
+
+    glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+    //glDispatchCompute( GLuint buffer );
+  } 
+
+
+  //Check Changes to the frag shader 
   if(shaderStream->update(nt)){ 
-    printf("Change Detected! \n");
+    printf("Change Detected in frag shader! \n");
     fragShaderPath = shaderStream->filenames->at(0).c_str(); 
     reloadShader(); 
     } 
@@ -25,9 +41,51 @@ void BVHApp_Application::reloadShader(){
      reloadShader(fragShaderPath);
 }
 
+//Shader compilation helper
+void checkShader(GLuint cshad){
+  // Check to see if the compilation was successful
+        GLint isCompiled = 0;
+        glGetShaderiv(cshad, GL_COMPILE_STATUS, &isCompiled);
+
+        if (isCompiled == GL_FALSE) {
+            // Get the length of the error message
+            GLint maxLength = 0;
+            glGetShaderiv(cshad, GL_INFO_LOG_LENGTH, &maxLength);
+
+            //The maxLength includes the NULL character
+            std::string infoLog(maxLength, 0);
+            glGetShaderInfoLog(cshad, maxLength, &maxLength, &infoLog[0]);
+
+            // Print the error mesage
+            std::cerr << "Failed to compile shader:\n" << infoLog << std::endl;
+
+            //We don't need the shader anymore.
+            glDeleteShader(cshad);
+        }
+
+}
 void BVHApp_Application::reloadShader(const char * fragShaderFile){
 
-   //Base app stuff 
+    //Compute Shader
+  std::ifstream fs(compShaderPath);
+  std::stringstream compSStr;
+  compSStr << fs.rdbuf();
+  std::string comp_src = compSStr.str();
+  const char * ccstr = comp_src.c_str();
+
+  GLuint cshader = glCreateShader(GL_COMPUTE_SHADER);
+  glShaderSource(cshader, 1, &ccstr, nullptr);
+  glCompileShader(cshader);
+  checkShader(cshader);
+  gl_errorFlush("compute shader compile");
+
+  compshader = glCreateProgram();
+  glAttachShader(compshader,cshader);
+  glLinkProgram(compshader);
+  gl_errorFlush("compute shader link");
+
+
+    //Fragment Shader
     cgra::Program m_program;
     m_program = m_program.load_program(
     CGRA_SRCDIR "/res/shaders/simple.vs.glsl",
@@ -47,7 +105,11 @@ void BVHApp_Application::reloadShader(const char * fragShaderFile){
   gl_errorFlush("linking");
   m_program.use();
   gl_errorFlush("use");
-  app_BVHRenderer->bvh_program = m_program.m_glprogram;
+  app_BVHRenderer->bvh_comp_program = compshader;
+  app_BVHRenderer->bvh_frag_program = m_program.m_glprogram;
+
+  sendBVH(theBVH,m_window);
+
 }
 
 
@@ -179,10 +241,9 @@ void BVHApp_Application::freshEditBuff(){
 
 }
 // GUI implementation defined in seperate file
-void BVHApp_Application::init(const char * fragShaderFile) {
+void BVHApp_Application::init(const char * compShaderFile, const char * fragShaderFile) {
    
     app_BVHRenderer = new BVHRenderer(m_window);
-  fragShaderPath = fragShaderFile;
 
     //View Stuff
     viewMatrix = glm::mat4 (1);
@@ -194,14 +255,28 @@ void BVHApp_Application::init(const char * fragShaderFile) {
 
     //Load the objs;
     loadObj("../srctree/res/models/sphere.obj",app_testmesh1);
-  gl_errorFlush("sphere");
+    gl_errorFlush("sphere");
     loadObj("../srctree/res/models/bunny.obj",app_testmesh2);
-  gl_errorFlush("bunny");
+    gl_errorFlush("bunny");
 
-  //Shader tracking stuff
-  if (!fragShaderFile) fragShaderFile = openShader();
+    //Shader tracking stuff
+    if (!fragShaderFile) {
+      fragShaderFile = openShader();
+    }
+      fragShaderPath = fragShaderFile;
+
+    if (!compShaderFile) {
+      compShaderFile = openShader();
+    }
+      compShaderPath = compShaderFile;
+
+    app_compshaderFilenames.clear();
+    app_compshaderFilenames.push_back(string(compShaderFile));
+
     app_shaderFilenames.clear();
     app_shaderFilenames.push_back(string(fragShaderFile));
+    
+    compShaderStream = new vmpwStringStreamConcat(&app_compshaderFilenames);
     shaderStream = new vmpwStringStreamConcat(&app_shaderFilenames);
     reloadShader();
     
