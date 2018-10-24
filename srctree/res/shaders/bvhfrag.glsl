@@ -20,7 +20,7 @@ layout(std430, binding = 4) buffer uvbuff
 };
 layout(std430, binding = 5) buffer tribuff
 {
-  int tris[];
+  unsigned int tris[];
 };
 layout(std430, binding = 6) buffer topobuff
 {
@@ -31,6 +31,8 @@ layout(std430, binding = 7) buffer bbsbuff
 {
   vec3 bbs[];
 };
+
+
 
 //Switches, single element uniforms
 const bool previewBBs = true;
@@ -52,6 +54,8 @@ const bool previewBBs = true;
   uniform int count;
 
  */
+
+
 
 //Test Buffers:
 const vec3 test_vertices[18] = vec3[]
@@ -236,12 +240,45 @@ traceData bvhTrace(ray r){
   return close;
 
 }
+
+traceData testTriIndex(ray r, unsigned int index){
+
+  traceData retr;
+//Get the tri points
+  vec3 a = points[tris[index*3]];
+  vec3 b = points[tris[index*3+1]];
+  vec3 c = points[tris[index*3+2]];
+
+/*  a=points[0];
+  b=points[1];
+  c=points[2];
+*/
+  //Get the pyramid vecs
+  vec3 rtoA = a-r.o;
+  vec3 rtoB = b-r.o;
+  vec3 rtoC = c-r.o;
+
+  float drFaceAB = dot(r.d, cross(rtoB,rtoA));
+  float drFaceBC = dot(r.d, cross(rtoC,rtoB));
+  float drFaceCA = dot(r.d, cross(rtoA,rtoC));
+
+  if(drFaceAB > 0 && drFaceBC> 0 && drFaceCA > 0){
+  //if(drFaceAB < 0 && drFaceCA < 0 && drFaceCA < 0){
+    //hits
+    retr.hits = true;
+  }
+  else retr.hits=false;
+  
+  return retr;
+}
+
 void main() {
 
-   vec3 camera_p = vec3(0,0,0);
+   vec3 camera_p = vec3(0.,-0.,5);
    ray camera_ray;
-   camera_ray.d = normalize(vec3(fragPosition.xy,0));
-   camera_ray.p = camera_p;
+   camera_ray.d = normalize(vec3(fragPosition.xy,1.));
+   camera_ray.d = camera_ray.d.xyz;
+   camera_ray.o = camera_p;
 
    //Here goes some tracing
 
@@ -249,35 +286,25 @@ void main() {
 
    // For all lights
 //   traceData 
+
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-  vec3 comp;
-  comp = fragPosition* 0.3;
+  
+  vec3 comp = vec3(0);
+  //comp = fragPosition* 0.3;
   //  comp = vec3(0,0,1);
 
   comp.b = points[0].r;
-  comp.b = normals[2].r;
+  comp.b = bbs[13].r;
+ 
+  float grey = 0;
+  float tri1 = (testTriIndex(camera_ray,3).hits==true) ? 0.9 : 0;
+  grey += tri1;
 
-  color = vec4(comp, 0.6);
+  vec3 trgb  = vec3(0);
+  //trgb =points[1];
+
+  comp = vec3(grey);
+  comp += trgb;
+  color = vec4(comp, 0);
 
 }

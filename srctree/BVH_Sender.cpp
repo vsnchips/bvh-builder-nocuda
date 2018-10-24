@@ -60,6 +60,8 @@ int sendBVH( BVH & theBVH, GLFWwindow * ctx){
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_DYNAMIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,7,bb_buff);
 
+  cout << "Uploaded BVH";
+  
   gl_errorFlush("send BVH ");
   return 0;
 

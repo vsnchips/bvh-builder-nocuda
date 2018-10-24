@@ -25,7 +25,14 @@ void BVHApp_Application::updateScene(clock_t nt) {
     printf("Change Detected in frag shader! \n");
     fragShaderPath = shaderStream->filenames->at(0).c_str(); 
     reloadShader(); 
-    } 
+ 
+    //Run the comp shader, too
+    glUseProgram(compshader);
+    glDispatchCompute(1,1,1);
+    glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+    //glDispatchCompute( GLuint buffer );
+
+   } 
 
   drawApp();
 }

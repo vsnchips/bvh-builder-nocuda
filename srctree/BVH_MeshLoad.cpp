@@ -5,6 +5,10 @@
 using namespace glm;
 using namespace std;
 
+void breakF(){
+  int breakline;
+}
+
 void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & in_uvs, 
 
     vector<unsigned int> & in_tris, mat4 & translation, mat4 & rotation){
@@ -135,7 +139,11 @@ void BVH::buildTopo(){
   //Check neighbors within a certain distance
   
   while(headcount > 1){ 
-  //Plurality condition
+
+    // GPU version: send updated head list to an SSBO
+    // Then do a polling pass on the gpu: 
+    
+    //Plurality condition
   cout << "\nNEW PASS Headcount :" << headcount << " heads \n";
 
   //Match finding stage, mingling //////////////////
@@ -145,12 +153,12 @@ void BVH::buildTopo(){
       // Forget about the last one!
       thisOne->want = nullptr;
       thisOne->wantbox.volume=-1;
-
       for(int i = 0; i< headcount; i++) {
         if ( j != i ){ //Avoid self clash
 
           BVHNode * thatOne = fetchNode(heads[i]); //Get Candidate
           // Try the match.
+        if (thisOne -> index < 0 || thisOne -> index > 2*leaves.size()) breakF();
 
           // Recieve a pitch
           if(thatOne->want == thisOne){
@@ -173,7 +181,9 @@ void BVH::buildTopo(){
             if (betterBox.volume < thisOne->wantbox.volume ||
                 thisOne->wantbox.volume == -1) 
               //Make the pitch.
-            { thisOne->wantbox = betterBox;
+            {
+if (thisOne->index == 10 ) breakF();
+              thisOne->wantbox = betterBox;
               thisOne->want = thatOne; 
             }
           }//End new pitch case
@@ -186,22 +196,26 @@ void BVH::buildTopo(){
     ///////Matchmaker registers mutual matches.
     // Unmatched nodes get pushed to the next round.
 
+    //Gpu version: Pull the updated want list from the gpu with image load/store
+    
+
     //Only go through once.
     vector<unsigned int> next_heads; next_heads.clear();
-    
+   
 #define NUPARADD leaves.size() -1 +parents.size()
 
     for (int i = 0 ; i < headcount; i++){
 
       BVHNode * bvA = fetchNode(heads[i]);
 
-      // Already marked
+      // If Already marked
       if ((bvA->marked)==true) continue;
-      //Every node wants a node. No nullptrs.
+
+      //Gpu version: checks here to want should reference the want image
+      //
         BVHNode * bvB = bvA-> want;
-      //if (bvB->marked) continue;
-        // Are they mutually matched?
-        //if(bvB->want_headIndex == A){  
+       // if (bvB -> index < 0 || bvB -> index > 2*leaves.size()) breakF();
+       //if (bvA -> index < 0 || bvA -> index > 2*leaves.size()) breakF();
         if(bvB->want == bvA){  
           //Make a parent
           
@@ -236,15 +250,62 @@ void BVH::buildTopo(){
         }
     }
     
-    //End match making pass.
+    //End match Fmaking pass.
     
     heads = next_heads;
     headcount = heads.size();
 
   } // Down to one head.
 
-    //Now print the spec buffers
-    dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> par_structure(-1);
-    dynamic_cast<BVHParentNode *>(  fetchNode(heads[0]) ) -> parent_toBuffs( & bvh_buffs );
+
+// To fix:
+//This is all fucking broken:
+//But i need a way to print the tree.
+// Each parent node stores its children as pointers.
+// It might aswell simply store absolute uint fetchnode references to them.
+// Use the fetchNode command to walk the tree and print the list.
+
+
+vector<int> topo_list; topo_list.clear();
+
+vector<vec3> bb_list; bb_list.clear();
+
+for (BVHLeaf l : leaves){
+  //topo
+  topo_list.push_back(-1);
+  topo_list.push_back(l.index);
+
+  //bb
+  bb_list.push_back(l.bb.origin);
+  bb_list.push_back(l.bb.basis[0]);
+  bb_list.push_back(l.bb.basis[1]);
+  bb_list.push_back(l.bb.basis[2]);
 
 }
+//Concatenate the parents after the leaves
+for (BVHParentNode p: parents){
+
+  //topo
+  topo_list.push_back(p.smallest->index);
+  topo_list.push_back(p.largest->index);
+
+  //bb
+  bb_list.push_back(p.bb.origin);
+  bb_list.push_back(p.bb.basis[0]);
+  bb_list.push_back(p.bb.basis[1]);
+  bb_list.push_back(p.bb.basis[2]);
+
+}
+
+//cout << "topo_list: " << topo_list << "\n";
+//cout << "bb_list: " << bb_list << "\n";
+breakF();
+
+bvh_buffs.topo = topo_list;
+bvh_buffs.bb_specs = bb_list;
+
+cout << "Host BVH buffers updated!";
+
+}
+
+

@@ -42,8 +42,8 @@ int BVHParentNode::par_structure(int p_id){
 
   if(smallest -> type ==1)  sid = sp->par_structure(p_id);
   else                      sid = sl->leaf_structure(p_id);
-  if(largest -> type ==1)   bid = lp->par_structure(p_id);
-  else                      bid = ll->leaf_structure(p_id);
+  if(largest -> type ==1)   bid = lp->par_structure(sid);
+  else                      bid = ll->leaf_structure(sid);
   
   cout << "structure a PARENT \n";
   index = bid + 1;                        //Head last;
