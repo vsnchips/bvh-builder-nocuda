@@ -72,7 +72,7 @@ public:
   ////Maintains and sends scene data to the shader:
   //Transforms
     void sendUniforms();
-    glm::mat4 viewMatrix;
+    glm::mat4 viewMatrix; //Deprecated
     glm::mat4 projectionMatrix;
     float m_scale;
     glm::vec2 m_viewportSize;

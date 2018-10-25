@@ -34,6 +34,9 @@ void BVHApp_Application::updateScene(clock_t nt) {
 
    } 
 
+
+   //Update view stuff
+  sendUniforms();
   drawApp();
 }
 
@@ -233,7 +236,10 @@ void BVHApp_Application::gl_ViewPrep(){
 
 }
 
-void BVHApp_Application::sendUniforms(){}
+void BVHApp_Application::sendUniforms(){
+   glUniformMatrix4fv(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"viewRotation"),1, GL_FALSE, &m_rotationMatrix[0][0]);
+   glUniform3fv(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"viewPosition"),1, &m_translation[0]);
+  }
 
 void BVHApp_Application::freshEditBuff(){
 

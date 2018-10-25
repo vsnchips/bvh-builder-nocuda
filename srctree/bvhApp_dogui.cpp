@@ -81,6 +81,7 @@ void BVHApp_Application::doGUI() {
 
 
   if(ImGui::Button("Load a sphere")){
+    theBVH.clearbuffs();
       loadObj("../srctree/res/models/sphere.obj",app_testmesh1);
       gl_errorFlush("sphere");
 
@@ -88,6 +89,7 @@ void BVHApp_Application::doGUI() {
   }
 
   if(ImGui::Button("Load a bunny rabbit")){
+    theBVH.clearbuffs();
       loadObj("../srctree/res/models/bunny.obj",app_testmesh1);
       gl_errorFlush("bunny");
 
@@ -98,7 +100,8 @@ void BVHApp_Application::doGUI() {
         nfdchar_t * objFile;
         NFD_OpenDialog(".obj,*","", &objFile);
 
-        loadObj((const char *)objFile, app_testmesh1);
+    theBVH.clearbuffs();
+            loadObj((const char *)objFile, app_testmesh1);
         mesh2BVH(app_testmesh1);
   }
   ImGui::End();

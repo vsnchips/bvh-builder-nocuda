@@ -20,7 +20,7 @@ layout(std430, binding = 4) buffer uvbuff
 };
 layout(std430, binding = 5) buffer tribuff
 {
-  unsigned int tris[];
+  uint tris[];
 };
 layout(std430, binding = 6) buffer topobuff
 {
@@ -32,7 +32,9 @@ layout(std430, binding = 7) buffer bbsbuff
   vec3 bbs[];
 };
 
-
+//Control uniforrms
+uniform mat4 viewRotation;
+uniform vec3 viewPosition;
 
 //Switches, single element uniforms
 const bool previewBBs = true;
@@ -56,7 +58,7 @@ const bool previewBBs = true;
  */
 
 
-
+/*
 //Test Buffers:
 const vec3 test_vertices[18] = vec3[]
 (
@@ -89,7 +91,7 @@ const int test_indices[18] = int[]
  12,13,14,
  15,16,17
  );
-
+*/
 
 out vec4 color;
 
@@ -241,53 +243,77 @@ traceData bvhTrace(ray r){
 
 }
 
-traceData testTriIndex(ray r, unsigned int index){
+struct triHit{ 
+  bool hits;
+  vec3 barys;
 
-  traceData retr;
+} theTri;
+
+void testTriIndex(ray r, int index){
+
 //Get the tri points
   vec3 a = points[tris[index*3]];
   vec3 b = points[tris[index*3+1]];
   vec3 c = points[tris[index*3+2]];
 
-/*  a=points[0];
-  b=points[1];
-  c=points[2];
-*/
   //Get the pyramid vecs
   vec3 rtoA = a-r.o;
   vec3 rtoB = b-r.o;
   vec3 rtoC = c-r.o;
 
+  //Middle point
+  vec3 mid = rtoA+rtoB+rtoC;
+
   float drFaceAB = dot(r.d, cross(rtoB,rtoA));
   float drFaceBC = dot(r.d, cross(rtoC,rtoB));
   float drFaceCA = dot(r.d, cross(rtoA,rtoC));
 
-  if(drFaceAB > 0 && drFaceBC> 0 && drFaceCA > 0){
+  
+  theTri.hits = (drFaceAB > 0 && drFaceBC> 0 && drFaceCA > 0);
+
+  theTri.hits = (drFaceAB == 1 || drFaceBC == 1 || drFaceCA == 1 || dot(mid,r.d) < 0) ?
+  false : theTri.hits;
   //if(drFaceAB < 0 && drFaceCA < 0 && drFaceCA < 0){
     //hits
-    retr.hits = true;
-  }
-  else retr.hits=false;
-  
-  return retr;
 }
 
 void main() {
 
-   vec3 camera_p = vec3(0.,-0.,5);
+   vec3 camera_p;
+   camera_p = viewPosition;
    ray camera_ray;
    camera_ray.d = normalize(vec3(fragPosition.xy,1.));
-   camera_ray.d = camera_ray.d.xyz;
-   camera_ray.o = camera_p;
+
+   //adapt the viewmat#
+   camera_ray.d *= mat3(
+    vec3( viewRotation[0][0],
+          viewRotation[0][1],
+          viewRotation[0][2]),
+    vec3( viewRotation[1][0],
+          viewRotation[1][1],
+          viewRotation[1][2]),
+    vec3( viewRotation[2][0],
+          viewRotation[2][1],
+          viewRotation[2][2])
+      );
+
+  camera_ray.o = camera_p;
 
    //Here goes some tracing
-
    //No distance functions to get the normals. They must be interpolated from the triangles barycentrically.
 
    // For all lights
 //   traceData 
 
-   
+// Brute force triangle testing
+   float tri1 = 0;
+
+   for (int i =58000; i < 58100; i++){
+  testTriIndex(camera_ray,i);
+
+  tri1 = (theTri.hits==true) ? tri1+0.05 : tri1;
+  
+  }
   
   vec3 comp = vec3(0);
   //comp = fragPosition* 0.3;
@@ -297,7 +323,6 @@ void main() {
   comp.b = bbs[13].r;
  
   float grey = 0;
-  float tri1 = (testTriIndex(camera_ray,3).hits==true) ? 0.9 : 0;
   grey += tri1;
 
   vec3 trgb  = vec3(0);

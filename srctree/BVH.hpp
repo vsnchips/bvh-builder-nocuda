@@ -52,7 +52,7 @@ struct bufferPack{
   std::vector<glm::vec3> verts;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> uvs;
-  std::vector<int> trispecs;
+  std::vector<unsigned int> trispecs;
   std::vector<int> matIDs;
 
   std::vector<glm::vec3> bb_specs;

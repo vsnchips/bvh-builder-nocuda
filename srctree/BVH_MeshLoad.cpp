@@ -44,7 +44,7 @@ void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & i
   }
 
   // Fill out the  primitive vectors
-  for (unsigned int i :in_tris){
+  for (unsigned int i : in_tris){
     bvh_buffs.trispecs.push_back(i); 
   }
  
@@ -70,8 +70,6 @@ void BVH::countNodes(){
 
 BVHNode * BVH::fetchNode(unsigned int i){
  if (i>=leaves.size()) return ( & (parents.at(i-leaves.size()) ) );
- //if (i>=lcount) return (BVHNode *) ( & (parents.at(i-lcount) ) );
-  //else          return (BVHNode *) ( & (leaves.at(i) ) );
  return ( & (leaves.at(i) ) );
   
 }
