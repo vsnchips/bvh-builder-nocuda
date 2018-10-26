@@ -69,14 +69,23 @@ void BVH::countNodes(){
 }
 
 BVHNode * BVH::fetchNode(unsigned int i){
+
+  cout << "grabbing at index " << i << "\n\
+    leaves size " << leaves.size() << "\n";
+
  if (i>=leaves.size()) return ( & (parents.at(i-leaves.size()) ) );
  return ( & (leaves.at(i) ) );
   
 }
 void BVH::createLeaves(){
 
-  //int forestCount = bvh_buffs.trispecs.size()/3;
-  int forestCount = 20;
+  int forestCount = bvh_buffs.trispecs.size()/3;
+  //int forestCount = 4;
+
+  //We know the amount of leaves. Reserve their memory.
+  leaves.reserve(forestCount);
+  parents.reserve(forestCount-1);
+
 
   for (int i = 0; i < forestCount; i++){
     bvhTriangle nt;
@@ -138,6 +147,11 @@ void BVH::buildTopo(){
   
   while(headcount > 1){ 
 
+    cout << "\n New head List!\n";
+    for( int h : heads){
+      cout << h << " ";
+    }
+
     // GPU version: send updated head list to an SSBO
     // Then do a polling pass on the gpu: 
     
@@ -165,6 +179,7 @@ void BVH::buildTopo(){
                 thatOne->wantbox.volume <
                 thisOne->wantbox.volume) { 
               thisOne->want = thatOne;
+    cout << " want ptr = want->index " << (thisOne->want == fetchNode(thisOne->want->index)) <<  "\n";
               thisOne->wantbox = thatOne->wantbox;
            }
           }
@@ -183,6 +198,7 @@ void BVH::buildTopo(){
 if (thisOne->index == 10 ) breakF();
               thisOne->wantbox = betterBox;
               thisOne->want = thatOne; 
+    cout << " want ptr = want->index " << (thisOne->want == fetchNode(thisOne->want->index)) <<  "\n";
             }
           }//End new pitch case
         }//selfclash check
@@ -200,18 +216,23 @@ if (thisOne->index == 10 ) breakF();
     //Only go through once.
     vector<unsigned int> next_heads; next_heads.clear();
    
-#define NUPARADD leaves.size() -1 +parents.size()
+#define NUPARADD leaves.size()+parents.size()
 
     for (int i = 0 ; i < headcount; i++){
 
       BVHNode * bvA = fetchNode(heads[i]);
 
+      cout << " Checking mark of"  << heads[i] << " indexed as " << bvA -> index << ": \n";
+      cout << "bvA marked as " << bvA->marked << "\n";
       // If Already marked
-      if ((bvA->marked)==true) continue;
+      if ((bvA->marked)==true){
+       continue;
+      }
 
       //Gpu version: checks here to want should reference the want image
       //
         BVHNode * bvB = bvA-> want;
+        //cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
        // if (bvB -> index < 0 || bvB -> index > 2*leaves.size()) breakF();
        //if (bvA -> index < 0 || bvA -> index > 2*leaves.size()) breakF();
         if(bvB->want == bvA){  
@@ -232,12 +253,23 @@ if (thisOne->index == 10 ) breakF();
 
           if(bvA->parcount > 1) cout << "OOPS! Node " << bvA->index << " has " << bvA->parcount << " parents!\n";
 
-          parents.push_back(nuPar);
-          cout << "There are now this many parents: " << parents.size() <<"\n";
 
           next_heads.push_back( NUPARADD );
+        cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
+          parents.push_back(nuPar);
+        cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
+          cout << "There are now this many parents: " << parents.size() <<"\n";
+          
           bvA->marked = true;
           bvB->marked = true;
+
+          BVHNode * checkN = fetchNode(bvB->index);
+          //cout << " check N marked as : " << checkN->marked << "\n";
+          //cout << " Equality of fetchNode bvb-index and bvb: " << (checkN==bvB) << "\n";
+          //cout << " Equality of fetchNode bvb-index and bvb: " << (fetchNode(bvB-index)==bvB) << "\n";
+
+          cout << "marked"<<  bvA -> index << " as TRUE \n";
+          cout << "marked"<<  bvB -> index << " as TRUE \n";
         }
         
         //Neither marked, nor matched.
