@@ -12,7 +12,8 @@ void breakF(){
 void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & in_uvs, 
 
     vector<unsigned int> & in_tris, mat4 & translation, mat4 & rotation){
-  for (vec3 v : in_vp){
+  for(int i = 0; i < in_tris.size(); i++){
+    vec3 v = in_vp[i];
     vec4 v4p = vec4(
         v.x, v.y, v.z, 1.0
       );
@@ -27,7 +28,8 @@ void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & i
     bvh_buffs.verts.push_back(v); 
   }
  
-  for (vec3 n : in_norm){
+  for(int i = 0; i < in_norm.size(); i++){
+    vec3 n = in_norm[i];
 
     vec4 n4p = vec4(
         n.x, n.y, n.z, 1.0
@@ -39,13 +41,14 @@ void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & i
     bvh_buffs.normals.push_back(normalize(n)); 
   }
  
-  for (vec2 uv : in_uvs){
+  for(int i = 0; i < in_uvs.size(); i++){
+    vec2 uv = in_uvs[i];
     bvh_buffs.uvs.push_back(uv); 
   }
 
   // Fill out the  primitive vectors
-  for (unsigned int i : in_tris){
-    bvh_buffs.trispecs.push_back(i); 
+  for(int i = 0; i < in_tris.size(); i++){
+    bvh_buffs.trispecs.push_back(in_tris[i]); 
   }
  
 }

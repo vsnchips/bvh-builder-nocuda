@@ -170,25 +170,27 @@ void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh){
 void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh, mat4 & translation, mat4 & rotation){
  
   //get verts in an array
-  vector<vec3> vs_in;
-  for( cgra::Mesh::Vertex v: inMesh.m_vertices ){
+  vector<vec3> vs_in;vs_in.clear();
+  for(int i=0; i< inMesh.m_vertices.size(); i++){
+    cgra::Mesh::Vertex v = inMesh.m_vertices[i];
     vs_in.push_back(v.m_position);
   }
 
   //get normals in an array
-  vector<vec3> ns_in;
-  for(cgra::Mesh::Vertex v: inMesh.m_vertices ){
+  vector<vec3> ns_in;ns_in.clear();
+  for(int i=0; i< inMesh.m_vertices.size(); i++){
+    cgra::Mesh::Vertex v = inMesh.m_vertices[i];
     ns_in.push_back(v.m_normal);
   }
 
   //get uvs in an array
-  vector<vec2> uvs_in;
-  for( cgra::Mesh::Vertex cv: inMesh.m_vertices ){
+  vector<vec2> uvs_in;uvs_in.clear();
+  for(int i=0; i< inMesh.m_vertices.size(); i++){
     uvs_in.push_back( vec2(1.0));  //no uvs on these meshes yet
   }
 
 
-  vector<vec2> dummyUV;
+  vector<vec2> dummyUV;dummyUV.clear();
   theBVH.addData(vs_in, ns_in, dummyUV, inMesh.m_indices, translation, rotation);
 
 }

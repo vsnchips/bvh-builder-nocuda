@@ -8,11 +8,11 @@ uniform mat4 projectionMat; //might not use..
 
 layout(std430, binding = 2) buffer vertbuff
 {
-  vec3 points[];
+  float pointFloats[];
 };
 layout(std430, binding = 3) buffer normalbuff
 {
-  vec3 normals[];
+  float normalFloats[];
 };
 layout(std430, binding = 4) buffer uvbuff
 {
@@ -31,6 +31,24 @@ layout(std430, binding = 7) buffer bbsbuff
 {
   vec3 bbs[];
 };
+
+//Recompose vec3s
+vec3 getPoint(unsigned int i){
+  return vec3(
+      pointFloats[i*3],
+      pointFloats[i*3+1],
+      pointFloats[i*3+2]
+      );
+}
+
+vec3 getNorm(unsigned int i){
+  return normalize(vec3(
+      normalFloats[i*3],
+      normalFloats[i*3+1],
+      normalFloats[i*3+2]
+      ));
+}
+
 
 //Control uniforrms
 uniform mat4 viewRotation;
@@ -245,16 +263,52 @@ traceData bvhTrace(ray r){
 
 struct triHit{ 
   bool hits;
-  vec3 barys;
+  vec3 hp;
+  vec3 n;
 
 } theTri;
 
-void testTriIndex(ray r, int index){
+
+vec3 bary(in vec3 a, in vec3 b, in vec3 c, in vec3 r){
+//project a-r onto b-c
+  vec3 rawbary =  vec3(
+      r.x*(b.y*c.z-b.z*c.y) +
+      r.y*(b.z*c.x-b.x*c.z) +
+      r.z*(b.x*c.y-b.y*c.x),
+      r.x*(c.y*a.z-c.z*a.y) +
+      r.y*(c.z*a.x-c.x*a.z) +
+      r.z*(c.x*a.y-c.y*a.x),
+      r.x*(a.y*b.z-a.z*b.y) +
+      r.y*(a.z*b.x-a.x*b.z) +
+      r.z*(a.x*b.y-a.y*b.x)
+      );
+
+  float manhattan =
+    /*
+  rawbary.x * rawbary.x+
+  rawbary.y * rawbary.y+
+  rawbary.z * rawbary.z;
+  return rawbary*rawbary/manhattan;*/
+  rawbary.x+
+  rawbary.y+
+  rawbary.z;
+  return rawbary/manhattan;
+
+//  return normalize( rawbary  );
+}
+
+vec3 tribary( in unsigned int index, in vec3 p){
+  return bary(getPoint(tris[index*3]),
+                  getPoint(tris[index*3+1]),
+                  getPoint(tris[index*3+2]),
+                  p);
+}
+void testTriIndex(in ray r, in int index){
 
 //Get the tri points
-  vec3 a = points[tris[index*3]];
-  vec3 b = points[tris[index*3+1]];
-  vec3 c = points[tris[index*3+2]];
+  vec3 a = getPoint(tris[index*3]);
+  vec3 b = getPoint(tris[index*3+1]);
+  vec3 c = getPoint(tris[index*3+2]);
 
   //Get the pyramid vecs
   vec3 rtoA = a-r.o;
@@ -273,8 +327,9 @@ void testTriIndex(ray r, int index){
 
   theTri.hits = (drFaceAB == 1 || drFaceBC == 1 || drFaceCA == 1 || dot(mid,r.d) < 0) ?
   false : theTri.hits;
-  //if(drFaceAB < 0 && drFaceCA < 0 && drFaceCA < 0){
-    //hits
+
+  theTri.n = normalize( cross( b-a, c-a ));
+  theTri.hp = r.o + r.d * dot(theTri.n,(a -r.o))/dot(theTri.n,r.d);
 }
 
 void main() {
@@ -282,9 +337,11 @@ void main() {
    vec3 camera_p;
    camera_p = viewPosition;
    ray camera_ray;
-   camera_ray.d = normalize(vec3(fragPosition.xy,1.));
+   camera_ray.d = normalize(vec3(fragPosition.xy,-1.)); //camera looks back at the origin by default
+  // camera_ray.d = normalize(vec3(fragPosition.xy,1.)); //camera looks back at the origin by default
 
    //adapt the viewmat#
+   
    camera_ray.d *= mat3(
     vec3( viewRotation[0][0],
           viewRotation[0][1],
@@ -304,31 +361,35 @@ void main() {
 
    // For all lights
 //   traceData 
+    vec3 fragNormal;
 
 // Brute force triangle testing
    float tri1 = 0;
 
-   for (int i =58000; i < 58100; i++){
+   vec3 accumNormCol = vec3(0);
+   
+   for (int i = 000; i < 80; i++){
   testTriIndex(camera_ray,i);
+  tri1 = (theTri.hits==true) ? tri1+0.2 : tri1;
+  if (theTri.hits){
+    
+    vec3 bary = tribary(i,theTri.hp);
+    fragNormal =
+      bary.x * getNorm(tris[i*3  ])+
+      bary.y * getNorm(tris[i*3+1])+
+      bary.z * getNorm(tris[i*3+2]);
+   // fragNormal = normalize(getNorm(tris[i*3+1]));
 
-  tri1 = (theTri.hits==true) ? tri1+0.05 : tri1;
-  
+    } 
   }
   
   vec3 comp = vec3(0);
-  //comp = fragPosition* 0.3;
-  //  comp = vec3(0,0,1);
 
-  comp.b = points[0].r;
-  comp.b = bbs[13].r;
+  comp += 1*fragNormal;
  
   float grey = 0;
-  grey += tri1;
 
   vec3 trgb  = vec3(0);
-  //trgb =points[1];
-
-  comp = vec3(grey);
   comp += trgb;
   color = vec4(comp, 0);
 

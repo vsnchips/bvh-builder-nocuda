@@ -38,5 +38,16 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z=1) in;
 void main(){
 //Do some work
 
-  normals[2].r = 0.15;
+//  normals[2].r = 0.15;
+
+  /*
+  points[0] = vec3(1,-0,3);
+  points[1] = vec3(2,1.2,0);
+  points[2] = vec3(-1.5,1.2,1);
+
+  tris[3]=0;
+  tris[4]=1;
+  tris[5]=2;
+  */
+
 }
