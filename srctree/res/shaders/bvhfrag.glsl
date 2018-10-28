@@ -2,7 +2,7 @@
 
 //Layout
 in vec3 fragPosition;
-in vec3 fragNormal;
+out vec4 color;
 
 uniform mat4 viewMat;
 uniform mat4 projectionMat; //might not use.. 
@@ -30,11 +30,66 @@ layout(std430, binding = 6) buffer topobuff
 };
 layout(std430, binding = 7) buffer bbsbuff
 {
-  vec3 bbs[];
+  /*Layout:
+  0-2: Origin
+  3-5: Dimensions
+  6-14: Orthogonal basis
+  */
+  float bbs[];
 };
 
 //Helper functions 
 //Recompose vec3s
+
+vec3 getBB_Origin(unsigned int i){ return vec3(0,0,0);}
+vec3 getBB_Dims(unsigned int i){ return vec3( -1,- 1, -1 );}
+vec3 getBBi(unsigned int i){ return vec3(-1,0,0);}
+vec3 getBBj(unsigned int i){ return vec3(0,-1,0);}
+vec3 getBBk(unsigned int i){ return vec3(0,0,-1);}
+
+/*
+vec3 getBB_Origin(unsigned int i){
+  return vec3(
+      bbs[i*15+0],
+      bbs[i*15+1],
+      bbs[i*15+2] );
+}
+vec3 getBB_Dims(unsigned int i){
+  return vec3(
+      bbs[i*15+3],
+      bbs[i*15+4],
+      bbs[i*15+5] );
+}
+vec3 getBBi(unsigned int i){
+  return vec3(
+      bbs[i*15+6],
+      bbs[i*15+7],
+      bbs[i*15+8]);
+}
+
+vec3 getBBj(unsigned int i){
+  return vec3(
+      bbs[i*15+9],
+      bbs[i*15+10],
+      bbs[i*15+11]);
+}
+
+vec3 getBBk(unsigned int i){
+  return vec3(
+      bbs[i*15+12],
+      bbs[i*15+13],
+      bbs[i*15+14]);
+}
+*/
+mat3 getBB_Basis(unsigned int i){
+  return mat3(
+     getBBi(i), 
+     getBBj(i), 
+     getBBk(i) 
+   );
+}
+
+//Vertex Attributes
 vec3 getPoint(unsigned int i){
   return vec3(
       pointFloats[i*3],
@@ -51,13 +106,13 @@ vec3 getNorm(unsigned int i){
       ));
 }
 
+
 //Control uniforrms
 uniform mat4 viewRotation;
 uniform vec3 viewPosition;
 
 //Development switches, single element uniforms
 const bool previewBBs = true;
-out vec4 color;
 
 //Lighting Regular Constants
 const vec3 lightDir = vec3(0.1, 0.1, -1);
@@ -67,6 +122,7 @@ const vec3 specColor    = vec3(0.2, 0.1, 0.1);
 const float shininess = 16.0;
 
 #define rot2(X) mat2(cos(X), -sin(X), sin(X), cos(X))
+#define FAR 999999999
 
 struct triHit{ 
   bool hits;
@@ -78,32 +134,23 @@ struct triHit{
   float t; // how far along the ray
 
 } theTri;
-triHit ESCAPE = triHit(false, vec3(0), vec3(0),-1, -1, vec2(0));
-#define FAR 99999999999
+const triHit ESCAPE = triHit(false, vec3(0), vec3(0),-1, -1, vec2(0),FAR);
 
 struct bvhHit{
   bool hits;
   vec3 hp;
-  vec3 uv;
+  vec2 uv;
   float t;
 } theBvhHit;
 
-struct boxToTestWithin{
-  int boxID;
-  float t; // -1 For origin containers
-} visit;
+const bvhHit BVH_ESCAPE = bvhHit(false,vec3(0),vec2(0),FAR);
 
 struct traceData{
   triHit bestHit;
   unsigned int treeDepth;
   float boxAccum; //Accumulate albedo of boxes;
-} leafRay;
-
-traceData leafRay;//All the state
-
-struct bb_info{
-  
-}visitBB;
+} leafRay; 
+ 
 struct triangle{
   vec3 pa;
   vec3 pb;
@@ -142,11 +189,6 @@ vec3 bary(in vec3 a, in vec3 b, in vec3 c, in vec3 r){
       );
 
   float manhattan =
-    /*
-  rawbary.x * rawbary.x+
-  rawbary.y * rawbary.y+
-  rawbary.z * rawbary.z;
-  return rawbary*rawbary/manhattan;*/
   rawbary.x+
   rawbary.y+
   rawbary.z;
@@ -161,44 +203,47 @@ vec3 tribary( in unsigned int index, in vec3 p){
                   getPoint(tris[index*3+2]),
                   p);
 }
-void testTriIndex(in ray r, in int index);
-//Global variables
 
+//Globals and forward declarations
+
+void testTriIndex(in ray r, in int index);
+vec3 fragNormal;
 void cameraRaySetup();
-  ray camera_ray;
-  vec3 camera_p;
-void bruteTris();
+ray camera_ray;
+vec3 camera_p;
+void bruteForceTris();
+  
   float tri1 = 0;
 
 void leafTrace( ray r, unsigned int head );
+
 void main() {
 
-  cameraRaySetup();
+   cameraRaySetup();
   // For all lights
-    vec3 fragNormal;
-
-   void bruteForceTris();
  
    // Get the illuminance traced by one ray in the simple
    // direct lighting case (the leaf of the ray tree)
 
    // RayTracing program:
-
-   leafRay.triHit = ESCAPE;
-   
-   unsigned int headNode = 159;
+   leafRay.bestHit = ESCAPE;
+   unsigned int headNode = 0;
    leafTrace(camera_ray,headNode);
-      //Final compositing
+    
+    bruteForceTris();
+
+   //Final compositing
    vec3 comp = vec3(0);
 
-  comp += 1*fragNormal;
+   comp += leafRay.boxAccum;
+   if (length(fragNormal) > 0.9 )
+  comp = fragNormal+0.0000000000005*comp;
  
   float grey = 0;
 
-  vec3 trgb  = vec3(0);
-  comp += trgb;
+  //  vec3 trgb = getPoint(0);
+  //comp += trgb;
   color = vec4(comp, 0);
-
 
 }
 
@@ -225,22 +270,20 @@ void cameraRaySetup(){
 // Brute Force Tris ////////////////////////////
 ///////////////////////////////////////////////
 
-void bruteTris(){
+void bruteForceTris(){
    // Brute force triangle testing
 
    vec3 accumNormCol = vec3(0);
    
    for (int i = 0; i < 80; i++){
   testTriIndex(camera_ray,i);
-  tri1 = (theTri.hits==true) ? tri1+0.2 : tri1;
   if (theTri.hits){
     
     vec3 bary = tribary(i,theTri.hp);
-      fragNormal =
+    fragNormal +=
       bary.x * getNorm(tris[i*3  ])+
       bary.y * getNorm(tris[i*3+1])+
       bary.z * getNorm(tris[i*3+2]);
-   // fragNormal = normalize(getNorm(tris[i*3+1]));
 
     } 
   }
@@ -249,60 +292,44 @@ void bruteTris(){
 // Testing Methods
 
 // Box Testing ////////////////////////
-
 vec3 basis_transform_point( vec3 rp, mat3 b){
   return vec3(
       dot(rp,b[0]),
       dot(rp,b[1]),
       dot(rp,b[2])
       );
- 
 }
+
 //TODO:test
 // Slab Box Intersection //////////////////////////////
 ///////////////////////////////////////////////////////
-void slabBox(unsigned int boxID, ray r){
-vec3 relp;
-vec3 tro;
-vec3 trd;
-
-  theBvhHit.hits = false;
-
-  relp = r.o - getBoxO(boxID);
-  mat3 basis = getBB_Basis (boxID);
-
+void slabBox(unsigned int boxID, ray cr){
+  
+  theBvhHit = BVH_ESCAPE;
+  
+  vec3 toBoxOrigin = (getBB_Origin(boxID) - cr.o);
+  
   // Transform to basis first. Test against axis planes.
-    vi = normalize(basis[0]);
-    vj = normalize(basis[1]);
-    vk = normalize(basis[2]);
-    
-  tro = basis_transform_point(relp, mat3(vi,vj,vk));
-  trd = basis_transform_point(r.d, mat3(vi,vj,vk));
-
-  float   mint_i, maxt_i,
-          mint_j, maxt_j,
-          mint_k, maxt_k;
-     
-  // Plane intersections
+  mat3 base = getBB_Basis(boxID);
+  vec3 tro;
+  vec3 trd;
   //dot the ray dir with the basis;
-
+  trd = basis_transform_point(cr.d, base);
   float dR_i = trd.x;
   float dR_j = trd.y;
   float dR_k = trd.z;
 
   //dot the ray origin with the basis;
+  tro = basis_transform_point(toBoxOrigin, base);
   float dRor_i = tro.x;
   float dRor_j = tro.y;
   float dRor_k = tro.z;
 
-  //basis lengths should be prepared earlier. TODO: move this.
-  vec3 dims = vec3(
-    length(basis[0]),
-    length(basis[1]),
-    length(basis[2])
-    );
+  //basis lengths should be prepared earlier.
+  vec3 dims = getBB_Dims(boxID);
 
-//Intersections
+//Intersection points
+  float mint_i, maxt_i, mint_j, maxt_j, mint_k, maxt_k;
 if (dR_i != 0)
   mint_i = dRor_i / dR_i;
   maxt_i = mint_i + dims[0]/dR_i;
@@ -314,7 +341,7 @@ if (dR_k != 0)
   maxt_k = mint_k + dims[2]/dR_k;
 
   float mint = -FAR;
-  float maxt = FAR;
+  float maxt =  FAR;
 
 //Clipping - forward
 if (dR_i>0){ //
@@ -329,8 +356,9 @@ if (dR_k>0){ //
   mint = max(mint, mint_k); 
   maxt = min(maxt, maxt_k); 
 }
-//Clipping - reverse
-if (dR_i>0){ //
+
+/*/Clipping - reverse
+if (dR_i<0){ //
   mint = max(mint, maxt_i); 
   maxt = min(maxt, mint_i); 
 } 
@@ -342,36 +370,33 @@ if (dR_k<0){ //
   mint = max(mint, maxt_k); 
   maxt = min(maxt, mint_k); 
 }
-
+*/
   theBvhHit.hits = (maxt>=mint);
   theBvhHit.t = mint;
+
+  // Debugging
+  if (theBvhHit.hits){
+   theBvhHit.hp = cr.o + theBvhHit.t *cr.d;
+   theBvhHit.uv = theBvhHit.hp.xy;
+  }
 }
 
 //TODO:test
 ////////////////////////////////////////
 // Box Contains Point ///////////////////
-bool inside;
-void boxcontains(unsigned int boxID, vec3 p){
-  mat3 basis = getBB_Basis (boxID);
+bool boxcontains(unsigned int boxID, vec3 p){
   vec3 dims = getBB_Dims(boxID);
-  
-  vec3 relp = p - getBoxO (boxID);
+  vec3 relp = p - getBB_Origin(boxID);
 
-
-  vec3 ba,bb,bc;
-    vi = normalize(basis[0]);
-    vj = normalize(basis[1]);
-    vk = normalize(basis[2]);
 // Todo: Investigate whether constructing individual floats
 // and testing them to break early is faster
-    vec3 tp = basis_transform_point(relp, mat3(vi,vj,vk));
+  vec3 tp = basis_transform_point(relp, getBB_Basis(boxID));
 
-    inside = (
-      0 < tp.x && tp.x < dims.x &&
-      0 < tp.y && tp.x < dims.y &&
-      0 < tp.z && tp.x < dims.z
-      );
-
+  return(
+    0 < tp.x && tp.x < dims.x &&
+    0 < tp.y && tp.y < dims.y &&
+    0 < tp.z && tp.z < dims.z
+    );
 }
 
 // Triangle /////////////////////////////
@@ -408,76 +433,71 @@ void testTriIndex(in ray r, in int index){
    /////////////////////////////////////////////////////
    // Trace Function   /////////////////////////////////
    /////////////////////////////////////////////////////
-void leafTrace( ray r, head ) {
+void leafTrace( ray r, unsigned int head ) {
    
   //leafTrace writes to the global leafRay struct.
 
-    visit.boxID = head ; //Begin beyond the root
+    unsigned int visit = head ; //Begin beyond the root
 
    //Make a stack of destinations 
    unsigned int stackCounter = 0;
-   boxToTestWithin visitStack[32]; // TODO resolve maximum stack depth
-
+   unsigned int visitStack[32]; // TODO resolve maximum stack depth
 
    // PUSH TO ORIGIN PHASE ////////////////////////////////
      //walk to the one which contains the origin.
-    while( boxcontains (visit.boxID,r.o) ){
-    
-      if topo[visit.boxID*2] == -1; //triangle case - origin is in one prim's bounding box
-      break;
-
-      //else its a parent node, 
-      //push its smaller one to the stack and visit the first.
-
-      slabBox(topo[visit.boxID*2+1]);
-      boxToTestWithin visitStack[stackCounter] = theBvhHit;
-      visit = boxToTestWithin(topo[visit.boxID*2],t);
+    while( boxcontains (visit,r.o) ){
+      //triangle case
+      //origin is in one prim's bounding box
+      if (topo[visit*2] == -1)  {break;}
+      //parent node case
+      //push its smaller one
+      visitStack[stackCounter] = topo[visit*2+1];
       stackCounter ++;
-     
-      //or theres no root.)
-
+      // and visit the first.
+      visit = topo[visit*2];
     }
-    // Now visiting at a primitive node, or visiting at a non origin
+   
+    // Now, visiting at a primitive node, or visiting at a non origin
     // containing node.
-
-    // This node must be tested. Push it to the stack.
-    slabBox(visit.boxID);
-    if (theBvhHit.hits) visitStack[stackCounter ++] = visit;
+    // It may not contain the origin but may intersect the ray.
+    // Push it to the stack if it intersects.
+    slabBox(visit,r);
+    if (theBvhHit.hits) {
+      visitStack[stackCounter ++] = visit;
+      leafRay.boxAccum += 0.2;
+    }
+      leafRay.boxAccum += 0.000001* theBvhHit.t*theBvhHit.t;
     
    // INTERSECTION PHASE ////////////////////////////////////
-   // Stack built. Start intersecting.
+   // Stack preloaded. Start intersecting.
     while ( stackCounter > 0 ){
-    // Pop a box that I know I intersect with.
+    // Pop a box that I might intersect with.
     // The stackCounter is decremented on every lap.
       visit = visitStack[-1+stackCounter]; stackCounter--;
-    // Is it beyond the closest media ?
-      if (visit.t < bestHit.t){
+
+      // Intersect it. Is it beyond the closest media ?
+      slabBox(visit,r);
+      if (!theBvhHit.hits) continue;
+      if (theBvhHit.t < leafRay.bestHit.t){
         continue; 
       }
-
+     
+     //leafRay.boxAccum += theBvhHit.uv.x*0.3;
+      leafRay.boxAccum += 0.5;
     // Primitive case
-      testTriIndex(topo[visit.boxID*2+1]);
-      if(theTri.t <leafRay.bestHit.t &&  
+      testTriIndex(r,topo[visit*2+1]);
+      if(theTri.t < leafRay.bestHit.t &&     //Hit an interface! 
          theTri.t > 0){
         leafRay.bestHit = theTri;
         continue;
       }
    // Parent case; Intersect a box
-      unsigned int small = topo[visit.boxID * 2];
-      unsigned int large = topo[visit.boxID * 2 + 1];
-    // Intersection cases
+      unsigned int small = topo[visit * 2];
+      unsigned int large = topo[visit * 2 + 1];
     // Push the bigger box last, to test it first.
     // (Small boxes are more likely to be further than the best hit)
-      slabBox(small,r);
-      if(theBvhHit.hits){
-       visitStack[stackCounter++] = boxToTestWithin(small,theBvhHit.t);
-      }
-      slabBox(large,r);
-      if(theBvhHit.hits){
-       visitStack[stackCounter++] = boxToTestWithin(large,theBvhHit.t);
-      }
-    } // Traversal escaped the tree. Got the best hit.
+       visitStack[stackCounter++] = (small);
+       visitStack[stackCounter++] = (large);
+     }
+} // Traversal escaped the tree. Got the best hit.
 //////////////////////////////////////////////////////////
-}
-
-
