@@ -33,7 +33,7 @@ layout(std430, binding = 7) buffer bbsbuff
   /*Layout:
   0-2: Origin
   3-5: Dimensions
-  6-14: Orthogonal basis
+  6-14: Orthonormal basis
   */
   float bbs[];
 };
@@ -41,11 +41,11 @@ layout(std430, binding = 7) buffer bbsbuff
 //Helper functions 
 //Recompose vec3s
 
-vec3 getBB_Origin(unsigned int i){ return vec3(0,0,0);}
-vec3 getBB_Dims(unsigned int i){ return vec3( -1,- 1, -1 );}
-vec3 getBBi(unsigned int i){ return vec3(-1,0,0);}
-vec3 getBBj(unsigned int i){ return vec3(0,-1,0);}
-vec3 getBBk(unsigned int i){ return vec3(0,0,-1);}
+vec3 getBB_Origin(unsigned int i){ return vec3(-0.51,-0.51,-0.49);}
+vec3 getBB_Dims(unsigned int i){ return vec3( 1,1,1 );}
+vec3 getBBi(unsigned int i){ return vec3(1,0,0);}
+vec3 getBBj(unsigned int i){ return vec3(0,1,0);}
+vec3 getBBk(unsigned int i){ return vec3(0,0,1);}
 
 /*
 vec3 getBB_Origin(unsigned int i){
@@ -330,15 +330,19 @@ void slabBox(unsigned int boxID, ray cr){
 
 //Intersection points
   float mint_i, maxt_i, mint_j, maxt_j, mint_k, maxt_k;
-if (dR_i != 0)
+
+  if (dR_i != 0){
   mint_i = dRor_i / dR_i;
   maxt_i = mint_i + dims[0]/dR_i;
-if (dR_j != 0)
+}
+if (dR_j != 0){
   mint_j = dRor_j / dR_j;
   maxt_j = mint_j + dims[1]/dR_j;
-if (dR_k != 0)
+}
+if (dR_k != 0){
   mint_k = dRor_k / dR_k;
   maxt_k = mint_k + dims[2]/dR_k;
+}
 
   float mint = -FAR;
   float maxt =  FAR;
@@ -357,7 +361,7 @@ if (dR_k>0){ //
   maxt = min(maxt, maxt_k); 
 }
 
-/*/Clipping - reverse
+//Clipping - reverse
 if (dR_i<0){ //
   mint = max(mint, maxt_i); 
   maxt = min(maxt, mint_i); 
@@ -370,7 +374,7 @@ if (dR_k<0){ //
   mint = max(mint, maxt_k); 
   maxt = min(maxt, mint_k); 
 }
-*/
+//
   theBvhHit.hits = (maxt>=mint);
   theBvhHit.t = mint;
 

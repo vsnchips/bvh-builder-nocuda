@@ -28,13 +28,13 @@ int sendBVH( BVH & theBVH, GLFWwindow * ctx){
    const void * buffHead;
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexbuff);
    size = sizeof(glm::vec3) * theBVH.bvh_buffs.verts.size();
-   buffHead =  reinterpret_cast<const GLfloat *>(&(theBVH.bvh_buffs.verts[0]));
+   buffHead =  reinterpret_cast<const void *>(&(theBVH.bvh_buffs.verts[0]));
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,2,vertexbuff);
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, normalbuff);
    size = sizeof(glm::vec3) * theBVH.bvh_buffs.normals.size();
-   buffHead =  reinterpret_cast<const GLfloat *>(&(theBVH.bvh_buffs.normals[0]));
+   buffHead =  reinterpret_cast<const void *>(&(theBVH.bvh_buffs.normals[0]));
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,3,normalbuff);
 
@@ -46,19 +46,19 @@ int sendBVH( BVH & theBVH, GLFWwindow * ctx){
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, tribuff);
    size = sizeof(unsigned int) * theBVH.bvh_buffs.trispecs.size();
-   buffHead =  reinterpret_cast<const GLuint *>(&(theBVH.bvh_buffs.trispecs[0]));
+   buffHead =  reinterpret_cast<const void *>(&(theBVH.bvh_buffs.trispecs[0]));
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,5,tribuff);
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, topobuff);
    size = sizeof(int) * theBVH.bvh_buffs.topo.size();
-   buffHead =  reinterpret_cast<const GLint *>(&(theBVH.bvh_buffs.topo[0]));
+   buffHead =  reinterpret_cast<const void *>(&(theBVH.bvh_buffs.topo[0]));
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,6,topobuff);
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, bb_buff);
    size = sizeof(glm::vec3) * theBVH.bvh_buffs.bb_specs.size();
-   buffHead =  reinterpret_cast<const GLfloat *>(&(theBVH.bvh_buffs.bb_specs[0]));
+   buffHead =  reinterpret_cast<const void *>(&(theBVH.bvh_buffs.bb_specs[0]));
   glBufferData(GL_SHADER_STORAGE_BUFFER, size, buffHead, GL_STATIC_DRAW);
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER,7,bb_buff);
 

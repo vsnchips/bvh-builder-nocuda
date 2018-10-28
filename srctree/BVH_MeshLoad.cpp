@@ -309,10 +309,18 @@ for (BVHLeaf l : leaves){
   topo_list.push_back(l.index);
 
   //bb
+  //Origin
   bb_list.push_back(l.bb.origin);
-  bb_list.push_back(l.bb.basis[0]);
-  bb_list.push_back(l.bb.basis[1]);
-  bb_list.push_back(l.bb.basis[2]);
+  //Dimensions
+  bb_list.push_back(vec3(
+        length(l.bb.basis[0]),
+        length(l.bb.basis[1]),
+        length(l.bb.basis[2]))
+        );
+  // Orthonormal basis
+  bb_list.push_back(normalize(l.bb.basis[0]));
+  bb_list.push_back(normalize(l.bb.basis[1]));
+  bb_list.push_back(normalize(l.bb.basis[2]));
 
 }
 //Concatenate the parents after the leaves
