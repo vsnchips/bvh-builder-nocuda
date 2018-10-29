@@ -13,7 +13,7 @@ using namespace std;
 void BVHApp_Application::doGUI() {
 
   ImGui::Begin("View");
-  ImGui::SliderFloat3("Translate",&m_translation[0],-20.0f,20.0f, "%.5f",1.5f);
+  ImGui::SliderFloat3("Translate",&m_translation[0],-50.0f,50.0f, "%.5f",1.5f);
   ImGui::SliderFloat("Scale",&m_scale,0,5.0f, "%.5f", 2.5f);
   if(ImGui::SliderFloat3("Rotate",&polarrotation[0],-M_PI,M_PI, "%.5f", 1.0f)){
     // User's spun the globe
@@ -61,10 +61,6 @@ void BVHApp_Application::doGUI() {
   ImGui::End();
 
   ImGui::Begin("Draw Uniforms");
-  static bool wireframe;
-  if(ImGui::Checkbox("Draw Wireframe",&wireframe)) {
-    cout << "TODO" << "\n";
-  }
 
   ImGui::End();
 

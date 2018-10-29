@@ -1,5 +1,6 @@
 #version 430 core
-
+//#pragma optimise(off)
+#define MAX_TRAVERSAL_STEPS 1024 
 //Layout
 in vec3 fragPosition;
 out vec4 color;
@@ -41,13 +42,13 @@ layout(std430, binding = 7) buffer bbsbuff
 //Helper functions 
 //Recompose vec3s
 
-vec3 getBB_Origin(unsigned int i){ return vec3(-0.51,-0.51,-0.49);}
-vec3 getBB_Dims(unsigned int i){ return vec3( 1,1,1 );}
-vec3 getBBi(unsigned int i){ return vec3(1,0,0);}
+//vec3 getBB_Origin(unsigned int i){ return vec3(-0.51,-0.51,-0.49);}
+//vec3 getBB_Dims(unsigned int i){ return vec3( 0.3, 0.3, 0.3 );}
+/*vec3 getBBi(unsigned int i){ return vec3(1,0,0);}
 vec3 getBBj(unsigned int i){ return vec3(0,1,0);}
 vec3 getBBk(unsigned int i){ return vec3(0,0,1);}
+*/
 
-/*
 vec3 getBB_Origin(unsigned int i){
   return vec3(
       bbs[i*15+0],
@@ -80,7 +81,7 @@ vec3 getBBk(unsigned int i){
       bbs[i*15+13],
       bbs[i*15+14]);
 }
-*/
+
 mat3 getBB_Basis(unsigned int i){
   return mat3(
      getBBi(i), 
@@ -122,7 +123,7 @@ const vec3 specColor    = vec3(0.2, 0.1, 0.1);
 const float shininess = 16.0;
 
 #define rot2(X) mat2(cos(X), -sin(X), sin(X), cos(X))
-#define FAR 999999999
+#define FAR 9999999
 
 struct triHit{ 
   bool hits;
@@ -227,7 +228,9 @@ void main() {
 
    // RayTracing program:
    leafRay.bestHit = ESCAPE;
-   unsigned int headNode = 0;
+   unsigned int headNode = 
+     158
+     ;
    leafTrace(camera_ray,headNode);
     
     bruteForceTris();
@@ -237,7 +240,7 @@ void main() {
 
    comp += leafRay.boxAccum;
    if (length(fragNormal) > 0.9 )
-  comp = fragNormal+0.0000000000005*comp;
+   comp += fragNormal * 0.3;
  
   float grey = 0;
 
@@ -251,7 +254,7 @@ void main() {
 ///////////////////////////////////////////////
 void cameraRaySetup(){
    camera_p = viewPosition;
-   camera_ray.d = normalize(vec3(fragPosition.xy,-1.)); //camera looks back at the origin by default
+   camera_ray.d = normalize(vec3(fragPosition.xy,-1.5)); //camera looks back at the origin by default
 //adapt the viewmat#
    camera_ray.d *= mat3(
     vec3( viewRotation[0][0],
@@ -445,8 +448,8 @@ void leafTrace( ray r, unsigned int head ) {
 
    //Make a stack of destinations 
    unsigned int stackCounter = 0;
-   unsigned int visitStack[32]; // TODO resolve maximum stack depth
-
+   unsigned int visitStack[16]; // TODO resolve maximum stack depth
+/*
    // PUSH TO ORIGIN PHASE ////////////////////////////////
      //walk to the one which contains the origin.
     while( boxcontains (visit,r.o) ){
@@ -460,21 +463,24 @@ void leafTrace( ray r, unsigned int head ) {
       // and visit the first.
       visit = topo[visit*2];
     }
-   
+  */ 
     // Now, visiting at a primitive node, or visiting at a non origin
     // containing node.
     // It may not contain the origin but may intersect the ray.
     // Push it to the stack if it intersects.
     slabBox(visit,r);
     if (theBvhHit.hits) {
-      visitStack[stackCounter ++] = visit;
+//      visitStack[stackCounter] = visit;
+      visitStack[stackCounter] = 153;
+      stackCounter += 1;
       leafRay.boxAccum += 0.2;
     }
-      leafRay.boxAccum += 0.000001* theBvhHit.t*theBvhHit.t;
+   //leafRay.boxAccum += 0.000001* theBvhHit.t*theBvhHit.t;
     
    // INTERSECTION PHASE ////////////////////////////////////
    // Stack preloaded. Start intersecting.
-    while ( stackCounter > 0 ){
+    for (int  STEP = 0; STEP < MAX_TRAVERSAL_STEPS; STEP++){
+      if (stackCounter<=0) break;
     // Pop a box that I might intersect with.
     // The stackCounter is decremented on every lap.
       visit = visitStack[-1+stackCounter]; stackCounter--;
@@ -482,12 +488,12 @@ void leafTrace( ray r, unsigned int head ) {
       // Intersect it. Is it beyond the closest media ?
       slabBox(visit,r);
       if (!theBvhHit.hits) continue;
-      if (theBvhHit.t < leafRay.bestHit.t){
+      if (theBvhHit.t > leafRay.bestHit.t){
         continue; 
       }
      
+      leafRay.boxAccum += 0.1;
      //leafRay.boxAccum += theBvhHit.uv.x*0.3;
-      leafRay.boxAccum += 0.5;
     // Primitive case
       testTriIndex(r,topo[visit*2+1]);
       if(theTri.t < leafRay.bestHit.t &&     //Hit an interface! 
@@ -500,8 +506,8 @@ void leafTrace( ray r, unsigned int head ) {
       unsigned int large = topo[visit * 2 + 1];
     // Push the bigger box last, to test it first.
     // (Small boxes are more likely to be further than the best hit)
-       visitStack[stackCounter++] = (small);
-       visitStack[stackCounter++] = (large);
+      visitStack[stackCounter++] = (small);
+      visitStack[stackCounter++] = (large);
      }
 } // Traversal escaped the tree. Got the best hit.
 //////////////////////////////////////////////////////////

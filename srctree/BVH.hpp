@@ -19,7 +19,6 @@ class BVH_BBox{
     glm::mat3 basis;    //orientation
     void updateBasis();
     std::vector<glm::vec3> points;
-    glm::vec3 origin;  //bounding box extends from 0 to 1 in the basis in all of its dimensions.
     float volume = -1;
 
     int isPrim = -1;
@@ -172,7 +171,7 @@ class BVH{
 //    HELPERS                           //
 int sendBVH(BVH & theBVH, GLFWwindow * ctx);
 
-float setVolume(std::vector<glm::vec3> set);
+float setVolume(std::vector<glm::vec3> & set);
 std::vector<glm::vec3> containing_set( BVH_BBox * a, BVH_BBox * b);
 
 ////////////////////////////////////////////////////////////////////////////////

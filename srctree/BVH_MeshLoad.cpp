@@ -106,6 +106,7 @@ void BVH::createLeaves(){
 
     leaves.push_back(newleaf);
     cout << "created leaf " << leaves[i].index << "\n";
+    cout << "with bounding box size : " << newleaf.bb.volume << "\n";
 
   }//End Buffer Filling
 
@@ -178,7 +179,7 @@ void BVH::buildTopo(){
           // Recieve a pitch
           if(thatOne->want == thisOne){
               //accept conditions
-              if(thisOne->wantbox.volume==-1 ||
+              if(thisOne->wantbox.volume== -1 ||
                 thatOne->wantbox.volume <
                 thisOne->wantbox.volume) { 
               thisOne->want = thatOne;
@@ -187,19 +188,14 @@ void BVH::buildTopo(){
            }
           }
           else { // No pitch, try a pitch
-            BVH_BBox tryBoxA = BVH_BBox(&(thisOne->bb),&(thatOne->bb));
-            BVH_BBox tryBoxB = BVH_BBox(&(thatOne->bb),&(thisOne->bb));
+            BVH_BBox testBox = BVH_BBox(&(thatOne->bb),&(thisOne->bb));
 
-            //which one is better?
-            BVH_BBox betterBox = 
-              (tryBoxA.volume<tryBoxB.volume) ? tryBoxA : tryBoxB;
-
-            if (betterBox.volume < thisOne->wantbox.volume ||
+            if (testBox.volume < thisOne->wantbox.volume ||
                 thisOne->wantbox.volume == -1) 
               //Make the pitch.
             {
 if (thisOne->index == 10 ) breakF();
-              thisOne->wantbox = betterBox;
+              thisOne->wantbox = testBox;
               thisOne->want = thatOne; 
     cout << " want ptr = want->index " << (thisOne->want == fetchNode(thisOne->want->index)) <<  "\n";
             }
@@ -225,8 +221,8 @@ if (thisOne->index == 10 ) breakF();
 
       BVHNode * bvA = fetchNode(heads[i]);
 
-      cout << " Checking mark of"  << heads[i] << " indexed as " << bvA -> index << ": \n";
-      cout << "bvA marked as " << bvA->marked << "\n";
+      //cout << " Checking mark of"  << heads[i] << " indexed as " << bvA -> index << ": \n";
+      //cout << "bvA marked as " << bvA->marked << "\n";
       // If Already marked
       if ((bvA->marked)==true){
        continue;
@@ -235,9 +231,6 @@ if (thisOne->index == 10 ) breakF();
       //Gpu version: checks here to want should reference the want image
       //
         BVHNode * bvB = bvA-> want;
-        //cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
-       // if (bvB -> index < 0 || bvB -> index > 2*leaves.size()) breakF();
-       //if (bvA -> index < 0 || bvA -> index > 2*leaves.size()) breakF();
         if(bvB->want == bvA){  
           //Make a parent
           
@@ -247,21 +240,22 @@ if (thisOne->index == 10 ) breakF();
               node %d\n", bvA->index, bvB->index);
 
           BVHParentNode nuPar = BVHParentNode( bvA, bvB );
-
           //Index iteration
           nuPar.index = NUPARADD;
+          nuPar.bb.uniqueid = bb_counter++; 
+        cout << "made new parent, with bounding box size : " << nuPar.bb.volume << "\n";
 
           bvA->parcount = bvA->parcount+1;
           bvB->parcount = bvB->parcount+1;
 
-          if(bvA->parcount > 1) cout << "OOPS! Node " << bvA->index << " has " << bvA->parcount << " parents!\n";
 
+        if(bvA->parcount > 1) cout << "OOPS! Node " << bvA->index << " has " << bvA->parcount << " parents!\n";
 
           next_heads.push_back( NUPARADD );
-        cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
+       // cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
           parents.push_back(nuPar);
-        cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
-          cout << "There are now this many parents: " << parents.size() <<"\n";
+        //cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
+        cout << "There are now this many parents: " << parents.size() <<"\n";
           
           bvA->marked = true;
           bvB->marked = true;
@@ -271,15 +265,15 @@ if (thisOne->index == 10 ) breakF();
           //cout << " Equality of fetchNode bvb-index and bvb: " << (checkN==bvB) << "\n";
           //cout << " Equality of fetchNode bvb-index and bvb: " << (fetchNode(bvB-index)==bvB) << "\n";
 
-          cout << "marked"<<  bvA -> index << " as TRUE \n";
-          cout << "marked"<<  bvB -> index << " as TRUE \n";
+       // cout << "marked"<<  bvA -> index << " as TRUE \n";
+      //  cout << "marked"<<  bvB -> index << " as TRUE \n";
         }
         
         //Neither marked, nor matched.
         //push to next round.
         else{ next_heads.push_back(heads[i]);
-          cout << "No match, push this head to the next round. \n";
-          cout << next_heads.size() << " Heads next round, at least\n";
+        //  cout << "No match, push this head to the next round. \n";
+        //  cout << next_heads.size() << " Heads next round, at least\n";
         }
     }
     
@@ -310,14 +304,15 @@ for (BVHLeaf l : leaves){
 
   //bb
   //Origin
-  bb_list.push_back(l.bb.origin);
+  bb_list.push_back(l.bb.points[0]);
   //Dimensions
   bb_list.push_back(vec3(
         length(l.bb.basis[0]),
         length(l.bb.basis[1]),
         length(l.bb.basis[2]))
+        //1.f)
         );
-  // Orthonormal basis
+  /// Orthonormal basis
   bb_list.push_back(normalize(l.bb.basis[0]));
   bb_list.push_back(normalize(l.bb.basis[1]));
   bb_list.push_back(normalize(l.bb.basis[2]));
@@ -331,10 +326,19 @@ for (BVHParentNode p: parents){
   topo_list.push_back(p.largest->index);
 
   //bb
-  bb_list.push_back(p.bb.origin);
-  bb_list.push_back(p.bb.basis[0]);
-  bb_list.push_back(p.bb.basis[1]);
-  bb_list.push_back(p.bb.basis[2]);
+  //Origin
+  bb_list.push_back(p.bb.points[0]);
+  //Dimensions
+  bb_list.push_back(vec3(
+        length(p.bb.basis[0]),
+        length(p.bb.basis[1]),
+        length(p.bb.basis[2]))
+        //1.f)
+        );
+  /// Orthonormal basis
+  bb_list.push_back(normalize(p.bb.basis[0]));
+  bb_list.push_back(normalize(p.bb.basis[1]));
+  bb_list.push_back(normalize(p.bb.basis[2]));
 
 }
 
