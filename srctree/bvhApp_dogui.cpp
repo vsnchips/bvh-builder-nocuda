@@ -61,11 +61,9 @@ void BVHApp_Application::doGUI() {
   ImGui::End();
 
   ImGui::Begin("Draw Uniforms");
-
   ImGui::End();
 
   ImGui::Begin("BVH Controls");
-
   if(ImGui::Button( "Send to GPU" )){
     sendBVH( theBVH, m_window );
   }
@@ -100,5 +98,12 @@ void BVHApp_Application::doGUI() {
             loadObj((const char *)objFile, app_testmesh1);
         mesh2BVH(app_testmesh1);
   }
+
+  ImGui::SliderInt("Maximum Primitives",&maxPrims,0,2000);
+
+  ImGui::End();
+
+  ImGui::Begin("Messages");
+//    ImGui::Text();
   ImGui::End();
 }

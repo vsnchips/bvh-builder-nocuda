@@ -191,7 +191,13 @@ void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh, mat4 & translation, mat4 
 
 
   vector<vec2> dummyUV;dummyUV.clear();
-  theBVH.addData(vs_in, ns_in, dummyUV, inMesh.m_indices, translation, rotation);
+
+  vector<unsigned int> renderable_tri_indices; renderable_tri_indices.clear();
+  for(int i=0; i < glm::min(int(inMesh.m_indices.size()),int(maxPrims*3)); i++ ){
+    renderable_tri_indices.push_back(inMesh.m_indices[i]);
+  }
+
+  theBVH.addData(vs_in, ns_in, dummyUV, renderable_tri_indices, translation, rotation);
 
 }
 

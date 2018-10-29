@@ -65,6 +65,7 @@ public:
     void mesh2BVH(cgra::Mesh &m, glm::mat4 & translation, glm::mat4 & rotation);
     cgra::Mesh app_testmesh1;
     cgra::Mesh app_testmesh2;
+     int maxPrims = 400;// Limit the amount of primitives to send to the BVH for testing
  
    //Scene Drawing
     void drawApp();

@@ -284,17 +284,8 @@ if (thisOne->index == 10 ) breakF();
 
   } // Down to one head.
 
-
-// To fix:
-//This is all fucking broken:
-//But i need a way to print the tree.
-// Each parent node stores its children as pointers.
-// It might aswell simply store absolute uint fetchnode references to them.
-// Use the fetchNode command to walk the tree and print the list.
-
-
+//Printing time
 vector<int> topo_list; topo_list.clear();
-
 vector<vec3> bb_list; bb_list.clear();
 
 for (BVHLeaf l : leaves){
@@ -342,15 +333,10 @@ for (BVHParentNode p: parents){
 
 }
 
-//cout << "topo_list: " << topo_list << "\n";
-//cout << "bb_list: " << bb_list << "\n";
-breakF();
-
 bvh_buffs.topo = topo_list;
 bvh_buffs.bb_specs = bb_list;
 
 cout << "Host BVH buffers updated!";
-
 }
 
 

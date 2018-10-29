@@ -1,6 +1,6 @@
 #version 430 core
 //#pragma optimise(off)
-#define MAX_TRAVERSAL_STEPS 1024 
+#define MAX_TRAVERSAL_STEPS 512 
 //Layout
 in vec3 fragPosition;
 out vec4 color;
@@ -209,10 +209,11 @@ vec3 tribary( in unsigned int index, in vec3 p){
 
 void testTriIndex(in ray r, in int index);
 vec3 fragNormal;
+vec3 leafTraceCol;
 void cameraRaySetup();
 ray camera_ray;
 vec3 camera_p;
-void bruteForceTris();
+void bruteForceTris(uint count);
   
   float tri1 = 0;
 
@@ -227,24 +228,39 @@ void main() {
    // direct lighting case (the leaf of the ray tree)
 
    // RayTracing program:
-   leafRay.bestHit = ESCAPE;
    unsigned int headNode = 
-     158
+    1416 
      ;
+
+   leafTraceCol = vec3(0);
    leafTrace(camera_ray,headNode);
-    
-    bruteForceTris();
+   
+   if(leafRay.bestHit.hits){
+     // A fresnel event interface has been found.
+     // It is a point on a triangle.
+     //Process it :
+     //Interpolate its normals.
+//     leafTraceCol = vec3(leafRay.boxAccum);
+     int i = leafRay.bestHit.elID;
+     vec3 bary = tribary(i, leafRay.bestHit.hp);
+     leafTraceCol +=
+      bary.x * getNorm(tris[i*3  ]) +
+      bary.y * getNorm(tris[i*3+1]) +
+      bary.z * getNorm(tris[i*3+2])
+//     + vec3( 5.0, 2, -1 )
+      ;
+  }
+  else{
+  leafTraceCol = vec3(leafRay.boxAccum)*0.22 ;
+  }
+  
+ //  bruteForceTris( 400 );
 
    //Final compositing
    vec3 comp = vec3(0);
-
-   comp += leafRay.boxAccum;
-   if (length(fragNormal) > 0.9 )
-   comp += fragNormal * 0.3;
- 
+   comp += leafTraceCol;//
   float grey = 0;
-
-  //  vec3 trgb = getPoint(0);
+  // vec3 trgb = getPoint(0);
   //comp += trgb;
   color = vec4(comp, 0);
 
@@ -273,17 +289,17 @@ void cameraRaySetup(){
 // Brute Force Tris ////////////////////////////
 ///////////////////////////////////////////////
 
-void bruteForceTris(){
+void bruteForceTris(uint count ){
    // Brute force triangle testing
 
    vec3 accumNormCol = vec3(0);
    
-   for (int i = 0; i < 80; i++){
+   for (int i = 0; i < count ; i++){
   testTriIndex(camera_ray,i);
   if (theTri.hits){
     
     vec3 bary = tribary(i,theTri.hp);
-    fragNormal +=
+    leafTraceCol +=
       bary.x * getNorm(tris[i*3  ])+
       bary.y * getNorm(tris[i*3+1])+
       bary.z * getNorm(tris[i*3+2]);
@@ -431,6 +447,7 @@ void testTriIndex(in ray r, in int index){
   theTri.hits = (drFaceAB == 1 || drFaceBC == 1 || drFaceCA == 1 || dot(mid,r.d) < 0) ?
   false : theTri.hits;
 
+  theTri.elID = index;
   // Plane intersection
   theTri.n = normalize( cross( b-a, c-a ));
   theTri.hp = r.o + r.d * dot(theTri.n,(a -r.o))/dot(theTri.n,r.d);
@@ -442,13 +459,15 @@ void testTriIndex(in ray r, in int index){
    /////////////////////////////////////////////////////
 void leafTrace( ray r, unsigned int head ) {
    
-  //leafTrace writes to the global leafRay struct.
+   leafRay.bestHit = ESCAPE;
+  
+   //leafTrace writes to the global leafRay struct.
 
     unsigned int visit = head ; //Begin beyond the root
 
    //Make a stack of destinations 
    unsigned int stackCounter = 0;
-   unsigned int visitStack[16]; // TODO resolve maximum stack depth
+   unsigned int visitStack[32]; // TODO resolve maximum stack depth and replace with a bitstack
 /*
    // PUSH TO ORIGIN PHASE ////////////////////////////////
      //walk to the one which contains the origin.
@@ -470,10 +489,10 @@ void leafTrace( ray r, unsigned int head ) {
     // Push it to the stack if it intersects.
     slabBox(visit,r);
     if (theBvhHit.hits) {
-//      visitStack[stackCounter] = visit;
-      visitStack[stackCounter] = 153;
+      visitStack[stackCounter] = visit;
+  //    visitStack[stackCounter] = 153;
       stackCounter += 1;
-      leafRay.boxAccum += 0.2;
+      leafRay.boxAccum += 0.002;
     }
    //leafRay.boxAccum += 0.000001* theBvhHit.t*theBvhHit.t;
     
@@ -492,22 +511,27 @@ void leafTrace( ray r, unsigned int head ) {
         continue; 
       }
      
-      leafRay.boxAccum += 0.1;
-     //leafRay.boxAccum += theBvhHit.uv.x*0.3;
-    // Primitive case
-      testTriIndex(r,topo[visit*2+1]);
-      if(theTri.t < leafRay.bestHit.t &&     //Hit an interface! 
-         theTri.t > 0){
-        leafRay.bestHit = theTri;
-        continue;
+      leafRay.boxAccum += 0.03;
+
+      // Primitive case
+      if (topo[visit*2-1] < 0){
+      testTriIndex(r,topo[(visit)*2]);
+        if( theTri.hits 
+            && theTri.t < leafRay.bestHit.t ){
+//            && theTri.t > 0){
+            //Hit an interface!            
+          leafRay.bestHit.hits=true;
+          leafRay.bestHit = theTri;
+        }
+      continue;
       }
    // Parent case; Intersect a box
-      unsigned int small = topo[visit * 2];
-      unsigned int large = topo[visit * 2 + 1];
+      unsigned int small = topo[visit * 2 - 1];
+      unsigned int large = topo[visit * 2 ];//+ 1];
     // Push the bigger box last, to test it first.
     // (Small boxes are more likely to be further than the best hit)
-      visitStack[stackCounter++] = (small);
-      visitStack[stackCounter++] = (large);
+      visitStack[stackCounter] = small; stackCounter++;
+      visitStack[stackCounter] = large; stackCounter++;
      }
 } // Traversal escaped the tree. Got the best hit.
 //////////////////////////////////////////////////////////
