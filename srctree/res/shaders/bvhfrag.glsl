@@ -229,7 +229,8 @@ void main() {
 
    // RayTracing program:
    unsigned int headNode = 
-    1416 
+   // 1416
+     3998
      ;
 
    leafTraceCol = vec3(0);
