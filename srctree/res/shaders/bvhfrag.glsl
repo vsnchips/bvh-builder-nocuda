@@ -348,26 +348,26 @@ void slabBox(unsigned int boxID, ray cr){
   //basis lengths should be prepared earlier.
   vec3 dims = getBB_Dims(boxID);
 
-//Intersection points
+  //Intersection points
   float mint_i, maxt_i, mint_j, maxt_j, mint_k, maxt_k;
 
   if (dR_i != 0){
-  mint_i = dRor_i / dR_i;
-  maxt_i = mint_i + dims[0]/dR_i;
-}
-if (dR_j != 0){
-  mint_j = dRor_j / dR_j;
-  maxt_j = mint_j + dims[1]/dR_j;
-}
-if (dR_k != 0){
-  mint_k = dRor_k / dR_k;
-  maxt_k = mint_k + dims[2]/dR_k;
-}
+    mint_i = dRor_i / dR_i;
+    maxt_i = mint_i + dims[0]/dR_i;
+  }
+  if (dR_j != 0){
+    mint_j = dRor_j / dR_j;
+    maxt_j = mint_j + dims[1]/dR_j;
+  }
+  if (dR_k != 0){
+    mint_k = dRor_k / dR_k;
+    maxt_k = mint_k + dims[2]/dR_k;
+  }
 
   float mint = -FAR;
   float maxt =  FAR;
 
-//Clipping - forward
+  //Clipping - forward
 if (dR_i>0){ //
   mint = max(mint, mint_i); 
   maxt = min(maxt, maxt_i); 
@@ -395,8 +395,10 @@ if (dR_k<0){ //
   maxt = min(maxt, mint_k); 
 }
 //
-  theBvhHit.hits = (maxt>=mint);
   theBvhHit.t = mint;
+  //It hits if it intersects and t is less than maxt.
+  //theBvhHit.hits = ((maxt>=mint)) && dot(trd,normalize(tro))>-0.6;// && theBvhHit.t == mint);
+  theBvhHit.hits = ((maxt>=mint)) && maxt>0;//dot(trd,normalize(tro))>-0.6;// && theBvhHit.t == mint);
 
   // Debugging
   if (theBvhHit.hits){
