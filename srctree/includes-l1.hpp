@@ -8,6 +8,7 @@
 #include <istream>
 #include <ostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -38,3 +39,7 @@
 //portable module includes
 
 #include "submods/stringStreamConCat/vmpwStringStreamConcat.hpp"
+
+//Debugging:
+void gl_errorFlush(const char  * at);
+
