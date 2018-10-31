@@ -230,7 +230,7 @@ void main() {
    // RayTracing program:
    unsigned int headNode = 
    // 1416
-     3998
+   3600-16-2 
      ;
 
    leafTraceCol = vec3(0);
@@ -443,15 +443,18 @@ void testTriIndex(in ray r, in int index){
   float drFaceBC = dot(r.d, cross(rtoC,rtoB));
   float drFaceCA = dot(r.d, cross(rtoA,rtoC));
 
-  theTri.hits = (drFaceAB > 0 && drFaceBC> 0 && drFaceCA > 0);
-
+  theTri.hits = (drFaceAB > 0 && drFaceBC> 0 && drFaceCA > 0
+              || drFaceAB < 0 && drFaceBC< 0 && drFaceCA < 0); // hit backface
+ // ); // cull backface
   theTri.hits = (drFaceAB == 1 || drFaceBC == 1 || drFaceCA == 1 || dot(mid,r.d) < 0) ?
   false : theTri.hits;
 
   theTri.elID = index;
   // Plane intersection
   theTri.n = normalize( cross( b-a, c-a ));
-  theTri.hp = r.o + r.d * dot(theTri.n,(a -r.o))/dot(theTri.n,r.d);
+  theTri.t = dot(theTri.n,(a -r.o))/dot(theTri.n,r.d);
+  theTri.hp = r.o + r.d*theTri.t;
+
 }
 
 //TODO:test
@@ -468,22 +471,22 @@ void leafTrace( ray r, unsigned int head ) {
 
    //Make a stack of destinations 
    unsigned int stackCounter = 0;
-   unsigned int visitStack[32]; // TODO resolve maximum stack depth and replace with a bitstack
-/*
+   unsigned int visitStack[16]; // TODO resolve maximum stack depth and replace with a bitstack
+
    // PUSH TO ORIGIN PHASE ////////////////////////////////
      //walk to the one which contains the origin.
     while( boxcontains (visit,r.o) ){
       //triangle case
       //origin is in one prim's bounding box
-      if (topo[visit*2] == -1)  {break;}
+      if (topo[visit-1] == -1)  {break;}
       //parent node case
       //push its smaller one
-      visitStack[stackCounter] = topo[visit*2+1];
+      visitStack[stackCounter] = topo[visit*2];
       stackCounter ++;
       // and visit the first.
-      visit = topo[visit*2];
+      visit = topo[visit*2-1];
     }
-  */ 
+  
     // Now, visiting at a primitive node, or visiting at a non origin
     // containing node.
     // It may not contain the origin but may intersect the ray.
@@ -518,8 +521,8 @@ void leafTrace( ray r, unsigned int head ) {
       if (topo[visit*2-1] < 0){
       testTriIndex(r,topo[(visit)*2]);
         if( theTri.hits 
-            && theTri.t < leafRay.bestHit.t ){
-//            && theTri.t > 0){
+            && theTri.t < leafRay.bestHit.t //){
+            && theTri.t > 0){
             //Hit an interface!            
           leafRay.bestHit.hits=true;
           leafRay.bestHit = theTri;

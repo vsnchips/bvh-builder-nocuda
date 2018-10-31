@@ -133,6 +133,7 @@ class BVH{
     void clearScene(){
       parents.clear();
       leaves.clear();
+      clearbuffs();
     }
 
     //The BVH Class can manage its gl buffers and send stuff to them:
