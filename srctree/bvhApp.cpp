@@ -235,7 +235,7 @@ void BVHApp_Application::gl_ViewPrep(){
     // View Transforms
     m_modelTransform = glm::mat4(1.0f);
     viewMatrix = glm::mat4(1);
-    viewMatrix[3] = glm::vec4(0, 0, -1, 1);
+    viewMatrix[3] = glm::vec4(0, 0, 1, 1);
 
     viewMatrix *= glm::translate(glm::mat4(),m_translation);
     viewMatrix *= glm::scale(m_modelTransform,glm::vec3(m_scale));

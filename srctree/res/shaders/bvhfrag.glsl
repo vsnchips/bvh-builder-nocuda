@@ -226,7 +226,8 @@ void main() {
 
    // RayTracing program:
    
-   unsigned int headNode = 3600-16-2  ;
+   //unsigned int headNode = 3600-16-2  ;
+   unsigned int headNode = 2*1355-2  ;
 //   headNode = iHead;
 
    leafTraceCol = vec3(0);
@@ -237,14 +238,12 @@ void main() {
      // It is a point on a triangle.
      //Process it :
      //Interpolate its normals.
-//     leafTraceCol = vec3(leafRay.boxAccum);
      int i = leafRay.bestHit.elID;
      vec3 bary = tribary(i, leafRay.bestHit.hp);
      leafTraceCol +=
       bary.x * getNorm(tris[i*3  ]) +
       bary.y * getNorm(tris[i*3+1]) +
       bary.z * getNorm(tris[i*3+2])
-//     + vec3( 5.0, 2, -1 )
       ;
   }
   else{

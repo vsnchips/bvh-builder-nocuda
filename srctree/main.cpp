@@ -123,7 +123,11 @@ int main(int argc, const char** argv) {
 			// Initialise `app`
       const char * fragPath = nullptr;//"";
       const char * compPath = nullptr;//"";
-      if (argc > 2){fragPath = argv[2]; compPath = argv[1];} else {std::cout << "BVH_Renderer <path to compute shader> <path to fragment shader>";}
+      if (argc > 2){fragPath = argv[2]; compPath = argv[1];} else {
+        fragPath = "../srctree/res/shaders/bvhfrag.glsl";
+        compPath = "../srctree/res/shaders/bvhcomp.glsl";
+      }
+//        std::cout << "BVH_Renderer <path to compute shader> <path to fragment shader>";}
       app.init(compPath,fragPath);
             // Loop until the GLFW window is marked to be closed
             while (!glfwWindowShouldClose(app.m_window)) {
