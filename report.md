@@ -1,10 +1,8 @@
-
-
-#### CGRA 350 Final Project
-
-# Agglomerative Building and Traversal of an Object Aligned Bounding Volume Heirarchy
-
-## Dan Aston 300406690
+---
+title: "Agglomerative Building and Traversal of an Object Aligned Bounding Volume Heirarchy"
+date: "October 2018"
+author: "Dan Aston 300406690"
+---
 
 ![](/home/shelly/local/CGRA350/demo/journal/ghostbunny_normal.png)
 
