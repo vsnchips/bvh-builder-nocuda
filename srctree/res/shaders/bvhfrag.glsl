@@ -1,6 +1,6 @@
 #version 430 core
 //#pragma optimise(off)
-#define MAX_TRAVERSAL_STEPS 512 
+#define MAX_TRAVERSAL_STEPS 200 
 //Layout
 in vec3 fragPosition;
 out vec4 color;
@@ -111,6 +111,7 @@ vec3 getNorm(unsigned int i){
 //Control uniforrms
 uniform mat4 viewRotation;
 uniform vec3 viewPosition;
+uniform bool uEdges;
 
 //Development switches, single element uniforms
 const bool previewBBs = true;
@@ -150,6 +151,7 @@ struct traceData{
   triHit bestHit;
   unsigned int treeDepth;
   float boxAccum; //Accumulate albedo of boxes;
+  float DEBUG_STEP_COST;
 } leafRay; 
  
 struct triangle{
@@ -210,6 +212,7 @@ vec3 tribary( in unsigned int index, in vec3 p){
 void testTriIndex(in ray r, in int index);
 vec3 fragNormal;
 vec3 leafTraceCol;
+vec3 bfCol;
 void cameraRaySetup();
 ray camera_ray;
 vec3 camera_p;
@@ -254,12 +257,17 @@ void main() {
   else{
   leafTraceCol = vec3(leafRay.boxAccum)*0.22 ;
   }
+  vec3 boxCol = vec3(leafRay.boxAccum)*0.22 ;
   
- //  bruteForceTris( 400 );
+   //bruteForceTris( 200 );
 
    //Final compositing
    vec3 comp = vec3(0);
-   comp += leafTraceCol;//
+   comp += boxCol;//
+   comp += bfCol;//
+
+   comp.r = 0;
+   comp.r = leafRay.DEBUG_STEP_COST/MAX_TRAVERSAL_STEPS;
   float grey = 0;
   // vec3 trgb = getPoint(0);
   //comp += trgb;
@@ -300,7 +308,7 @@ void bruteForceTris(uint count ){
   if (theTri.hits){
     
     vec3 bary = tribary(i,theTri.hp);
-    leafTraceCol +=
+    bfCol +=
       bary.x * getNorm(tris[i*3  ])+
       bary.y * getNorm(tris[i*3+1])+
       bary.z * getNorm(tris[i*3+2]);
@@ -478,6 +486,7 @@ void leafTrace( ray r, unsigned int head ) {
    // PUSH TO ORIGIN PHASE ////////////////////////////////
      //walk to the one which contains the origin.
     while( boxcontains (visit,r.o) ){
+
       //triangle case
       //origin is in one prim's bounding box
       if (topo[visit-1] == -1)  {break;}
@@ -506,6 +515,7 @@ void leafTrace( ray r, unsigned int head ) {
    // Stack preloaded. Start intersecting.
     for (int  STEP = 0; STEP < MAX_TRAVERSAL_STEPS; STEP++){
       if (stackCounter<=0) break;
+      leafRay.DEBUG_STEP_COST++;
     // Pop a box that I might intersect with.
     // The stackCounter is decremented on every lap.
       visit = visitStack[-1+stackCounter]; stackCounter--;

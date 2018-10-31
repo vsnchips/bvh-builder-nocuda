@@ -104,6 +104,7 @@ void BVHApp_Application::doGUI() {
   ImGui::End();
 
   ImGui::Begin("Messages");
-//    ImGui::Text();
+  long double tick = (long double)(frame_timer)/(long double)CLOCKS_PER_SEC;
+  ImGui::Text("Draw time: %Lf, \n Frame Rate : %Lf", tick, 1/tick); 
   ImGui::End();
 }

@@ -37,6 +37,7 @@ public:
   //Organise this file into responsibilities:
   // It updates
     void updateScene(clock_t nt);
+    clock_t frame_timer;
 
   // Has a BVH Renderer:
     BVHRenderer  * app_BVHRenderer;
