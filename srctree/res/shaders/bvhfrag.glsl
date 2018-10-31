@@ -223,15 +223,11 @@ void main() {
 
    cameraRaySetup();
   // For all lights
- 
-   // Get the illuminance traced by one ray in the simple
-   // direct lighting case (the leaf of the ray tree)
 
    // RayTracing program:
-   unsigned int headNode = 
-   // 1416
-   3600-16-2 
-     ;
+   
+   unsigned int headNode = 3600-16-2  ;
+//   headNode = iHead;
 
    leafTraceCol = vec3(0);
    leafTrace(camera_ray,headNode);
@@ -398,11 +394,11 @@ if (dR_k<0){ //
   theBvhHit.hits = (maxt>=mint);
   theBvhHit.t = mint;
 
-  // Debugging
+  /*/ Debugging
   if (theBvhHit.hits){
    theBvhHit.hp = cr.o + theBvhHit.t *cr.d;
    theBvhHit.uv = theBvhHit.hp.xy;
-  }
+  }*///
 }
 
 //TODO:test
@@ -474,48 +470,34 @@ void leafTrace( ray r, unsigned int head ) {
    unsigned int visitStack[16]; // TODO resolve maximum stack depth and replace with a bitstack
 
    // PUSH TO ORIGIN PHASE ////////////////////////////////
-     //walk to the one which contains the origin.
     while( boxcontains (visit,r.o) ){
       //triangle case
-      //origin is in one prim's bounding box
       if (topo[visit-1] == -1)  {break;}
       //parent node case
-      //push its smaller one
       visitStack[stackCounter] = topo[visit*2];
       stackCounter ++;
-      // and visit the first.
       visit = topo[visit*2-1];
     }
   
-    // Now, visiting at a primitive node, or visiting at a non origin
-    // containing node.
-    // It may not contain the origin but may intersect the ray.
-    // Push it to the stack if it intersects.
     slabBox(visit,r);
     if (theBvhHit.hits) {
       visitStack[stackCounter] = visit;
-  //    visitStack[stackCounter] = 153;
       stackCounter += 1;
       leafRay.boxAccum += 0.002;
     }
-   //leafRay.boxAccum += 0.000001* theBvhHit.t*theBvhHit.t;
     
    // INTERSECTION PHASE ////////////////////////////////////
-   // Stack preloaded. Start intersecting.
     for (int  STEP = 0; STEP < MAX_TRAVERSAL_STEPS; STEP++){
       if (stackCounter<=0) break;
-    // Pop a box that I might intersect with.
-    // The stackCounter is decremented on every lap.
-      visit = visitStack[-1+stackCounter]; stackCounter--;
+      visit = visitStack[-1+stackCounter--];
 
-      // Intersect it. Is it beyond the closest media ?
       slabBox(visit,r);
       if (!theBvhHit.hits) continue;
       if (theBvhHit.t > leafRay.bestHit.t){
         continue; 
       }
      
-      leafRay.boxAccum += 0.03;
+      leafRay.boxAccum += 0.03; //Visualise the bvh
 
       // Primitive case
       if (topo[visit*2-1] < 0){
@@ -523,19 +505,15 @@ void leafTrace( ray r, unsigned int head ) {
         if( theTri.hits 
             && theTri.t < leafRay.bestHit.t //){
             && theTri.t > 0){
-            //Hit an interface!            
           leafRay.bestHit.hits=true;
           leafRay.bestHit = theTri;
         }
       continue;
       }
-   // Parent case; Intersect a box
       unsigned int small = topo[visit * 2 - 1];
       unsigned int large = topo[visit * 2 ];//+ 1];
-    // Push the bigger box last, to test it first.
-    // (Small boxes are more likely to be further than the best hit)
-      visitStack[stackCounter] = small; stackCounter++;
-      visitStack[stackCounter] = large; stackCounter++;
+      visitStack[stackCounter++] = small;
+      visitStack[stackCounter++] = large;
      }
 } // Traversal escaped the tree. Got the best hit.
 //////////////////////////////////////////////////////////
