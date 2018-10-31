@@ -1,5 +1,6 @@
 #pragma once
 
+#include <experimental/filesystem>
 #include "cgra/mesh.hpp"
 #include "cgra/shader.hpp"
 

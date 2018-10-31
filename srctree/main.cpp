@@ -94,12 +94,12 @@ int main(int argc, const char** argv) {
     if (glMajor > 4 || (glMajor == 4 && glMinor >= 3)) {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 
-        glDebugMessageCallback(debugCallback, nullptr);
+        //glDebugMessageCallback(debugCallback, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
     } else if (GLEW_ARB_debug_output) {
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 
-        glDebugMessageCallbackARB(debugCallback, nullptr);
+        //glDebugMessageCallbackARB(debugCallback, nullptr);
         glDebugMessageControlARB(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
     }
 
