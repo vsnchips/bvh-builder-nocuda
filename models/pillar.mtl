@@ -1,0 +1,15 @@
+# Blender MTL File: 'pillar.blend'
+# Material Count: 1
+
+newmtl column_a.001
+Ns 5.882353
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Sponza/textures/sponza_column_a_diff.tga
+disp Sponza/textures/sponza_column_a_ddn.tga
+map_Ka Sponza/textures/sponza_column_a_diff.tga
