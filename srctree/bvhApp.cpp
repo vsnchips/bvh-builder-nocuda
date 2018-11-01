@@ -288,7 +288,7 @@ void BVHApp_Application::init(const char * compShaderFile, const char * fragShad
 
     //View Stuff
     viewMatrix = glm::mat4 (1);
-    viewMatrix[3] = glm::vec4(0, 0, , 1);
+    viewMatrix[3] = glm::vec4(0, 0, 5, 1);
     xax = glm::vec3(1.,0.,0.);
     yax = glm::vec3(0.,1.,0.);
     zax = glm::vec3(0.,0.,1.);
