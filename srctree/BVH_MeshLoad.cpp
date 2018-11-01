@@ -10,8 +10,10 @@ void breakF(){
 }
 
 void BVH::addData(vector<vec3> & in_vp, vector<vec3> & in_norm, vector<vec2> & in_uvs, 
+    vector<unsigned int> & in_tris, mat4 & translation, mat4 & rotation, unsigned int max_prims){
 
-    vector<unsigned int> & in_tris, mat4 & translation, mat4 & rotation){
+  maximum_leaves = max_prims;
+
   for(int i = 0; i < in_tris.size(); i++){
     vec3 v = in_vp[i];
     vec4 v4p = vec4(
@@ -82,7 +84,7 @@ BVHNode * BVH::fetchNode(unsigned int i){
 }
 void BVH::createLeaves(){
 
-  int forestCount = bvh_buffs.trispecs.size()/3;
+  int forestCount = glm::min((uint)bvh_buffs.trispecs.size()/3, maximum_leaves);
   //int forestCount = 4;
 
   //We know the amount of leaves. Reserve their memory.
@@ -112,8 +114,9 @@ void BVH::createLeaves(){
 
 }
 
-void BVH::buildTopo(){
+void BVH::buildTopo(unsigned int maxleaves){
 
+  maximum_leaves = maxleaves;
   clearScene();
   //Get the raw leaves
   createLeaves();
@@ -221,15 +224,11 @@ if (thisOne->index == 10 ) breakF();
 
       BVHNode * bvA = fetchNode(heads[i]);
 
-      //cout << " Checking mark of"  << heads[i] << " indexed as " << bvA -> index << ": \n";
-      //cout << "bvA marked as " << bvA->marked << "\n";
       // If Already marked
       if ((bvA->marked)==true){
        continue;
       }
 
-      //Gpu version: checks here to want should reference the want image
-      //
         BVHNode * bvB = bvA-> want;
         if(bvB->want == bvA){  
           //Make a parent
@@ -252,32 +251,22 @@ if (thisOne->index == 10 ) breakF();
         if(bvA->parcount > 1) cout << "OOPS! Node " << bvA->index << " has " << bvA->parcount << " parents!\n";
 
           next_heads.push_back( NUPARADD );
-       // cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
           parents.push_back(nuPar);
-        //cout << " bvb want ptr = index " << (bvB == fetchNode(bvB->index)) <<  "\n";
         cout << "There are now this many parents: " << parents.size() <<"\n";
           
           bvA->marked = true;
           bvB->marked = true;
 
           BVHNode * checkN = fetchNode(bvB->index);
-          //cout << " check N marked as : " << checkN->marked << "\n";
-          //cout << " Equality of fetchNode bvb-index and bvb: " << (checkN==bvB) << "\n";
-          //cout << " Equality of fetchNode bvb-index and bvb: " << (fetchNode(bvB-index)==bvB) << "\n";
-
-       // cout << "marked"<<  bvA -> index << " as TRUE \n";
-      //  cout << "marked"<<  bvB -> index << " as TRUE \n";
         }
         
         //Neither marked, nor matched.
         //push to next round.
         else{ next_heads.push_back(heads[i]);
-        //  cout << "No match, push this head to the next round. \n";
-        //  cout << next_heads.size() << " Heads next round, at least\n";
         }
     }
     
-    //End match Fmaking pass.
+    //End match making pass.
     
     heads = next_heads;
     headcount = heads.size();

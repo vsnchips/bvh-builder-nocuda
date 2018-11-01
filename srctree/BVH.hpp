@@ -133,7 +133,7 @@ class BVH{
     void clearScene(){
       parents.clear();
       leaves.clear();
-      clearbuffs();
+//      clearbuffs();
     }
 
     //The BVH Class can manage its gl buffers and send stuff to them:
@@ -148,7 +148,8 @@ class BVH{
 
     void addData(std::vector<glm::vec3> & in_vp, 
         std::vector<glm::vec3> & in_norm, std::vector<glm::vec2> & in_uvs, 
-        std::vector<unsigned int> & in_tris, glm::mat4 & t, glm::mat4 & r);
+        std::vector<unsigned int> & in_tris, glm::mat4 & t, glm::mat4 & r,
+        unsigned int );
     void addVerts(
         std::vector<glm::vec3> points, std::vector<glm::vec2> uvs);
     void addTris(
@@ -156,13 +157,15 @@ class BVH{
 
     //Building Functions
     unsigned int bb_counter=0; //bounding box count
-    void buildTopo();
+    void buildTopo( unsigned int  );
     void createLeaves();
+    unsigned int maximum_leaves;
     
     unsigned int nodeCount;
     unsigned int lcount;
     unsigned int pcount;
     void countNodes();
+
     BVHNode * fetchNode(unsigned int i);
 };
 

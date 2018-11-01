@@ -5,6 +5,16 @@ using namespace glm;
 
 void BVHApp_Application::updateScene(clock_t nt) {
 
+// Process input states
+//
+  doWasd();
+
+  u_PolarLook.y = (u_PolarLook.y < -glm::pi<float>()/2) ? -glm::pi<float>()/2: u_PolarLook.y;
+  u_PolarLook.y = (u_PolarLook.y > glm::pi<float>()/2) ? glm::pi<float>()/2: u_PolarLook.y;
+  
+  m_rotationMatrix = rotate( mat4(1), u_PolarLook.y, vec3(1,0,0)); 
+  m_rotationMatrix = rotate( m_rotationMatrix, u_PolarLook.x, vec3(0,1,0)); 
+
   //Check Changes to the comp shader 
   if(compShaderStream->update(nt)){ 
     printf("Change In comp shader detected! \n");
@@ -124,6 +134,8 @@ void BVHApp_Application::reloadShader(const char * fragShaderFile){
 
 
 void BVHApp_Application::loadObj(const char *filename,cgra::Mesh &targetMesh) {
+
+
     cgra::Wavefront obj;
     // Wrap the loading in a try..catch block
     try {
@@ -157,6 +169,8 @@ void BVHApp_Application::loadObj(const char *filename,cgra::Mesh &targetMesh) {
         for(int i = 0; i < numTriangles;i++) triangles.setRow(i,{obj.m_faces[i].m_vertices[0].m_p-1,
                                                                  obj.m_faces[i].m_vertices[1].m_p-1,
                                                                  obj.m_faces[i].m_vertices[2].m_p-1});
+    maxPrims += numTriangles;
+
     targetMesh.maxdist = obj.range;
     targetMesh.setData(vertices, triangles);
 
@@ -189,15 +203,9 @@ void BVHApp_Application::mesh2BVH(cgra::Mesh & inMesh, mat4 & translation, mat4 
     uvs_in.push_back( vec2(1.0));  //no uvs on these meshes yet
   }
 
-
   vector<vec2> dummyUV;dummyUV.clear();
 
-  vector<unsigned int> renderable_tri_indices; renderable_tri_indices.clear();
-  for(int i=0; i < glm::min(int(inMesh.m_indices.size()),int(maxPrims*3)); i++ ){
-    renderable_tri_indices.push_back(inMesh.m_indices[i]);
-  }
-
-  theBVH.addData(vs_in, ns_in, dummyUV, renderable_tri_indices, translation, rotation);
+  theBVH.addData(vs_in, ns_in, dummyUV, inMesh.m_indices, translation, rotation, maxPrims);
 
 }
 
@@ -209,8 +217,10 @@ void BVHApp_Application::drawApp(){
   m_program.setProjectionMatrix(projectionMatrix);
   m_program.setViewMatrix(viewMatrix);
   m_program.use();
+
+  frame_timer=clock();
   app_BVHRenderer->execute();
-  
+  frame_timer = clock() - frame_timer;
   ImGui_ImplGlfwGL3_NewFrame();
   doGUI();
   ImGui::Render();
@@ -235,11 +245,10 @@ void BVHApp_Application::gl_ViewPrep(){
     // View Transforms
     m_modelTransform = glm::mat4(1.0f);
     viewMatrix = glm::mat4(1);
-    viewMatrix[3] = glm::vec4(0, 0, -1, 1);
+    viewMatrix[3] = glm::vec4(0, 0, 1, 1);
 
     viewMatrix *= glm::translate(glm::mat4(),m_translation);
     viewMatrix *= glm::scale(m_modelTransform,glm::vec3(m_scale));
-    m_rotationMatrix = glm::mat4(glm::vec4(xax,0),glm::vec4(yax,0),glm::vec4(zax,0),glm::vec4(0.f,0.f,0.f,1.f));
     viewMatrix *= m_rotationMatrix;
 
 }
@@ -247,6 +256,17 @@ void BVHApp_Application::gl_ViewPrep(){
 void BVHApp_Application::sendUniforms(){
    glUniformMatrix4fv(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"viewRotation"),1, GL_FALSE, &m_rotationMatrix[0][0]);
    glUniform3fv(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"viewPosition"),1, &m_translation[0]);
+  
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_previewBBs"), u_previewBBs); 
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_primEdges"), u_primEdges); 
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_bvhEdges"), u_bvhEdges); 
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_showPrims"), u_showPrims); 
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_bruteForcePrims"), u_bruteForcePrims); 
+   
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_headNode"), u_headNode); 
+   glUniform1i(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_bruteForceCount"), u_bruteForceCount); 
+   
+   glUniformMatrix4fv(glGetUniformLocation(app_BVHRenderer->bvh_frag_program,"u_sceneTransforms"),20, GL_FALSE, &u_sceneTransforms[0][0][0]);
   }
 
 void BVHApp_Application::freshEditBuff(){
@@ -268,11 +288,11 @@ void BVHApp_Application::init(const char * compShaderFile, const char * fragShad
 
     //View Stuff
     viewMatrix = glm::mat4 (1);
-    viewMatrix[3] = glm::vec4(0, 0, -1, 1);
+    viewMatrix[3] = glm::vec4(0, 0, 5, 1);
     xax = glm::vec3(1.,0.,0.);
     yax = glm::vec3(0.,1.,0.);
     zax = glm::vec3(0.,0.,1.);
-    m_translation.z=-2.0f;
+    m_translation.z=5.0f;
 
     //Load the objs;
     loadObj("../srctree/res/models/sphere.obj",app_testmesh1);

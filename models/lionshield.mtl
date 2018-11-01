@@ -1,0 +1,28 @@
+# Blender MTL File: 'lionshield.blend'
+# Material Count: 2
+
+newmtl Material__25.001
+Ns 5.882353
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Sponza/textures/lion.tga
+disp Sponza/textures/lion_ddn.tga
+map_Ka Sponza/textures/lion.tga
+
+newmtl Material__298.001
+Ns 5.882353
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Sponza/textures/background.tga
+disp Sponza/textures/background_ddn.tga
+map_Ka Sponza/textures/background.tga

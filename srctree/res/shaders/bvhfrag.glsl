@@ -1,6 +1,6 @@
 #version 430 core
 //#pragma optimise(off)
-#define MAX_TRAVERSAL_STEPS 512 
+#define MAX_TRAVERSAL_STEPS 300 
 //Layout
 in vec3 fragPosition;
 out vec4 color;
@@ -25,9 +25,10 @@ layout(std430, binding = 5) buffer tribuff
   uint tris[];
 };
 layout(std430, binding = 6) buffer topobuff
-{
-  int headNode;
+{ 
+  unsigned int headNode;
   int topo[];
+
 };
 layout(std430, binding = 7) buffer bbsbuff
 {
@@ -111,9 +112,17 @@ vec3 getNorm(unsigned int i){
 //Control uniforrms
 uniform mat4 viewRotation;
 uniform vec3 viewPosition;
+uniform bool u_previewBBs;
+uniform bool u_primEdges;
+uniform bool u_bvhEdges;
+uniform bool u_showPrims;
+uniform bool u_bruteForcePrims;
+uniform int u_headNode;
+uniform int  u_bruteForceCount;
+  
+uniform mat4 u_sceneTransforms[20];
 
 //Development switches, single element uniforms
-const bool previewBBs = true;
 
 //Lighting Regular Constants
 const vec3 lightDir = vec3(0.1, 0.1, -1);
@@ -150,8 +159,9 @@ struct traceData{
   triHit bestHit;
   unsigned int treeDepth;
   float boxAccum; //Accumulate albedo of boxes;
-} leafRay; 
- 
+  float DEBUG_STEP_COST;
+}leafRay; 
+
 struct triangle{
   vec3 pa;
   vec3 pb;
@@ -210,12 +220,13 @@ vec3 tribary( in unsigned int index, in vec3 p){
 void testTriIndex(in ray r, in int index);
 vec3 fragNormal;
 vec3 leafTraceCol;
+vec3 bfCol;
 void cameraRaySetup();
 ray camera_ray;
 vec3 camera_p;
 void bruteForceTris(uint count);
-  
-  float tri1 = 0;
+
+float tri1 = 0;
 
 void leafTrace( ray r, unsigned int head );
 
@@ -226,36 +237,49 @@ void main() {
 
    // RayTracing program:
    
-   unsigned int headNode = 3600-16-2  ;
-//   headNode = iHead;
+   int headNode = u_headNode ;
+
+   leafRay.treeDepth=0;
+   leafRay.boxAccum=0;
+   leafRay.DEBUG_STEP_COST=0;
 
    leafTraceCol = vec3(0);
-   leafTrace(camera_ray,headNode);
-   
+  
+   if (headNode >= 0){
+    leafTrace(camera_ray,headNode);
+   }
+
    if(leafRay.bestHit.hits){
      // A fresnel event interface has been found.
      // It is a point on a triangle.
      //Process it :
      //Interpolate its normals.
-//     leafTraceCol = vec3(leafRay.boxAccum);
      int i = leafRay.bestHit.elID;
      vec3 bary = tribary(i, leafRay.bestHit.hp);
      leafTraceCol +=
       bary.x * getNorm(tris[i*3  ]) +
       bary.y * getNorm(tris[i*3+1]) +
       bary.z * getNorm(tris[i*3+2])
-//     + vec3( 5.0, 2, -1 )
       ;
   }
   else{
   leafTraceCol = vec3(leafRay.boxAccum)*0.22 ;
   }
+  vec3 boxCol = 0.2*vec3(leafRay.boxAccum)*0.22 ;
   
- //  bruteForceTris( 400 );
+   if (u_bruteForcePrims) bruteForceTris( u_bruteForceCount );
 
    //Final compositing
    vec3 comp = vec3(0);
-   comp += leafTraceCol;//
+
+   if (u_previewBBs)
+     comp += boxCol;//
+  
+   comp += leafTraceCol;
+   comp += bfCol;//
+
+   comp.r = 0;
+   comp.r = leafRay.DEBUG_STEP_COST/MAX_TRAVERSAL_STEPS;
   float grey = 0;
   // vec3 trgb = getPoint(0);
   //comp += trgb;
@@ -296,7 +320,7 @@ void bruteForceTris(uint count ){
   if (theTri.hits){
     
     vec3 bary = tribary(i,theTri.hp);
-    leafTraceCol +=
+    bfCol +=
       bary.x * getNorm(tris[i*3  ])+
       bary.y * getNorm(tris[i*3+1])+
       bary.z * getNorm(tris[i*3+2]);
@@ -344,26 +368,26 @@ void slabBox(unsigned int boxID, ray cr){
   //basis lengths should be prepared earlier.
   vec3 dims = getBB_Dims(boxID);
 
-//Intersection points
+  //Intersection points
   float mint_i, maxt_i, mint_j, maxt_j, mint_k, maxt_k;
 
   if (dR_i != 0){
-  mint_i = dRor_i / dR_i;
-  maxt_i = mint_i + dims[0]/dR_i;
-}
-if (dR_j != 0){
-  mint_j = dRor_j / dR_j;
-  maxt_j = mint_j + dims[1]/dR_j;
-}
-if (dR_k != 0){
-  mint_k = dRor_k / dR_k;
-  maxt_k = mint_k + dims[2]/dR_k;
-}
+    mint_i = dRor_i / dR_i;
+    maxt_i = mint_i + dims[0]/dR_i;
+  }
+  if (dR_j != 0){
+    mint_j = dRor_j / dR_j;
+    maxt_j = mint_j + dims[1]/dR_j;
+  }
+  if (dR_k != 0){
+    mint_k = dRor_k / dR_k;
+    maxt_k = mint_k + dims[2]/dR_k;
+  }
 
   float mint = -FAR;
   float maxt =  FAR;
 
-//Clipping - forward
+  //Clipping - forward
 if (dR_i>0){ //
   mint = max(mint, mint_i); 
   maxt = min(maxt, maxt_i); 
@@ -391,8 +415,10 @@ if (dR_k<0){ //
   maxt = min(maxt, mint_k); 
 }
 //
-  theBvhHit.hits = (maxt>=mint);
   theBvhHit.t = mint;
+  //It hits if it intersects and t is less than maxt.
+  //theBvhHit.hits = ((maxt>=mint)) && dot(trd,normalize(tro))>-0.6;// && theBvhHit.t == mint);
+  theBvhHit.hits = ((maxt>=mint)) && maxt>0;//dot(trd,normalize(tro))>-0.6;// && theBvhHit.t == mint);
 
   /*/ Debugging
   if (theBvhHit.hits){
@@ -471,6 +497,7 @@ void leafTrace( ray r, unsigned int head ) {
 
    // PUSH TO ORIGIN PHASE ////////////////////////////////
     while( boxcontains (visit,r.o) ){
+
       //triangle case
       if (topo[visit-1] == -1)  {break;}
       //parent node case
@@ -489,6 +516,10 @@ void leafTrace( ray r, unsigned int head ) {
    // INTERSECTION PHASE ////////////////////////////////////
     for (int  STEP = 0; STEP < MAX_TRAVERSAL_STEPS; STEP++){
       if (stackCounter<=0) break;
+      
+      leafRay.DEBUG_STEP_COST++;
+    // Pop a box that I might intersect with.
+    // The stackCounter is decremented on every lap.
       visit = visitStack[-1+stackCounter--];
 
       slabBox(visit,r);
@@ -500,7 +531,8 @@ void leafTrace( ray r, unsigned int head ) {
       leafRay.boxAccum += 0.03; //Visualise the bvh
 
       // Primitive case
-      if (topo[visit*2-1] < 0){
+      if (u_showPrims && topo[visit*2-1] < 0){
+      //if ( topo[visit*2-1] < 0){
       testTriIndex(r,topo[(visit)*2]);
         if( theTri.hits 
             && theTri.t < leafRay.bestHit.t //){
@@ -510,7 +542,7 @@ void leafTrace( ray r, unsigned int head ) {
         }
       continue;
       }
-      unsigned int small = topo[visit * 2 - 1];
+      unsigned int small = topo[visit * 2-1];
       unsigned int large = topo[visit * 2 ];//+ 1];
       visitStack[stackCounter++] = small;
       visitStack[stackCounter++] = large;

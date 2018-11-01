@@ -1,0 +1,15 @@
+# Blender MTL File: 'curtain.blend'
+# Material Count: 1
+
+newmtl fabric_c
+Ns 5.882353
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 2
+map_Kd Sponza/textures/sponza_curtain_diff.tga
+disp Sponza/textures/sponza_curtain_ddn.tga
+map_Ka Sponza/textures/sponza_curtain_diff.tga
