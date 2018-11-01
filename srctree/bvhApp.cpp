@@ -292,7 +292,7 @@ void BVHApp_Application::init(const char * compShaderFile, const char * fragShad
     xax = glm::vec3(1.,0.,0.);
     yax = glm::vec3(0.,1.,0.);
     zax = glm::vec3(0.,0.,1.);
-    m_translation.z=-2.0f;
+    m_translation.z=5.0f;
 
     //Load the objs;
     loadObj("../srctree/res/models/sphere.obj",app_testmesh1);
