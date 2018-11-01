@@ -1,2 +1,0 @@
-/usr/bin/ar qc ../../bin/libglew.a  CMakeFiles/glew.dir/src/glew.c.o
-/usr/bin/ranlib ../../bin/libglew.a
