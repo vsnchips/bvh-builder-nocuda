@@ -6,6 +6,8 @@ It builds a bounding volume heirarchy using agglomerative techniques.
 Building is currently single threaded.
 Traversal of the BVH is implemented as an intersection function in glsl, called for rays in the fragment shader.
 
+![](journal/ghostbunny_normal.png)
+
 ## How to build it
 
 The root source directory is srctree. 
@@ -41,12 +43,12 @@ Now, click "Send the BVH to the GPU".
 
 ## Interaction
 
-You can fly around with w a s d\
-You can orient the view while holding the left mouse button\
+You can fly around with w a s d.\
+You can orient the view while holding the left mouse button.\
 You can x/y pan with the middle mouse.\
 You can x/z pan with the right mouse.\
 You can toggle rendering of either traversed primitives or brute forced primitives.\
-You can slide the head node pointer around to highlight subtrees to observe the agglomeration pattern.\
+You can slide the head node pointer around to highlight subtrees to observe the agglomeration pattern.
 
 ## What do the colors mean?
 
