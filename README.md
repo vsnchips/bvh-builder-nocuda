@@ -60,6 +60,6 @@ Red tinting indicates that the occluding geometry is deep in the bvh from the pe
 ## Roadmap
 
 TODO: 
-> implement single-dispatch parallel build in a compute shader.
-> ????
-> Make it better!
+  > implement single-dispatch parallel build in a compute shader.\
+  > ????\
+  > Make it better!
