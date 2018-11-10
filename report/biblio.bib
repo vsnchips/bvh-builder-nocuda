@@ -1,0 +1,469 @@
+
+@report{zotero-2,
+  type = {report}
+}
+
+@article{stiboraBuildingSBVHGraphical,
+  title = {Building of {{SBVH}} on {{Graphical Hardware}}},
+  author = {Stibora, Bc Radek},
+  file = {/home/shelly/local/CGRA350/demo/SBVHonGPU-thesis.pdf}
+}
+
+@inproceedings{garciaFastParallelConstruction2014,
+  langid = {english},
+  location = {{Shenzhen, China}},
+  title = {Fast Parallel Construction of Stack-Less Complete {{LBVH}} Trees with Efficient Bit-Trail Traversal for Ray Tracing},
+  isbn = {978-1-4503-3254-5},
+  url = {http://dl.acm.org/citation.cfm?doid=2670473.2670488},
+  doi = {10.1145/2670473.2670488},
+  eventtitle = {The 13th {{ACM SIGGRAPH International Conference}}},
+  booktitle = {Proceedings of the 13th {{ACM SIGGRAPH International Conference}} on {{Virtual}}-{{Reality Continuum}} and Its {{Applications}} in {{Industry}} - {{VRCAI}} '14},
+  publisher = {{ACM Press}},
+  urldate = {2018-11-01},
+  date = {2014},
+  pages = {151-158},
+  author = {García, Arturo and Murguia, Sergio and Olivares, Ulises and Ramos, Félix F.},
+  file = {/home/shelly/Zotero/storage/IYSXC8SE/fastparallelstacklessLBVHwBittrail.pdf}
+}
+
+@inproceedings{guEfficientBVHConstruction2013,
+  title = {Efficient {{BVH Construction}} via {{Approximate Agglomerative Clustering}}},
+  doi = {10.1145/2492045.2492054},
+  abstract = {We introduce Approximate Agglomerative Clustering (AAC), an efficient, easily parallelizable algorithm for generating high-quality bounding volume hierarchies using agglomerative clustering. The main idea of AAC is to compute an approximation to the true greedy agglomerative clustering solution by restricting the set of candidates inspected when identifying neighboring geometry in the scene. The result is a simple algorithm that often produces higher quality hierarchies (in terms of subsequent ray tracing cost) than a full sweep SAH build yet executes in less time than the widely used top-down, approximate SAH build algorithm based on binning.},
+  booktitle = {High {{Performance Graphics}}},
+  date = {2013},
+  keywords = {Advanced Audio Coding,Approximation algorithm,Bounding volume hierarchy,Cluster analysis,Greedy algorithm,Product binning,Ray tracing (graphics),Top-down and bottom-up design},
+  author = {Gu, Yan and He, Yong Jun and Fatahalian, Kayvon and Blelloch, Guy E.},
+  file = {/home/shelly/Zotero/storage/LM3RD9GZ/sccg2011.pdf}
+}
+
+@online{GPUBasedParallelStackless,
+  title = {{{GPU}}-{{Based Parallel Stackless BVH Traversal}} for {{Animated Di}} Stributed {{Ray Tracing}} - {{Semantic Scholar}}},
+  url = {https://www.semanticscholar.org/paper/GPU-Based-Parallel-Stackless-BVH-Traversal-for-Di-UMBC/a143df2abbdc1b562da4e4a268f736b167865f0c},
+  urldate = {2018-11-01}
+}
+
+@inproceedings{umbcGPUBasedParallelStackless2009,
+  title = {{{GPU}}-{{Based Parallel Stackless BVH Traversal}} for {{Animated Di}} Stributed {{Ray Tracing}}},
+  abstract = {This paper presents a series of accelerations and technique s useful for performing interactive GPU-based distributed anim ated ray tracing. By taking advantage of several techniques used to a ccelerate ray tracing along with some additional effects, one is able to achieve enough speed to perform distributed ray tracing ani m ted scenes at interactive rates. A framework is provided to load both limited Standard Proced ural Database files [Haines 1987] or from standard OBJ files, th ese objects can be assembled into scenes that can be interactive ly explored. Use of transform nodes makes it possible to add additional features, including animation, without recomputin g the entire bounding volume hierarchy. Some acceleration structures used to achieve this result ar e st ckless traversal of bounding volume hierarchies using sphere s and parallel traversal which will be presented in this paper. CR Categories: I.3.7 [Computing Methodologies]: Graphics— Three-Dimensional Graphics and Realism},
+  date = {2009},
+  keywords = {Bounding volume hierarchy,Distributed ray tracing,Genotyping Techniques,Graphics processing unit,Ray tracing (graphics),Stackless Python,Tree traversal,Ural (computer)},
+  author = {UMBC, Charles Lohr},
+  file = {/home/shelly/Zotero/storage/G6G33GNF/UMBC - 2009 - GPU-Based Parallel Stackless BVH Traversal for Ani.pdf}
+}
+
+@inproceedings{hapalaEfficientStacklessBVH2013,
+  location = {{New York, NY, USA}},
+  title = {Efficient {{Stack}}-Less {{BVH Traversal}} for {{Ray Tracing}}},
+  isbn = {978-1-4503-1978-2},
+  url = {http://doi.acm.org/10.1145/2461217.2461219},
+  doi = {10.1145/2461217.2461219},
+  abstract = {We propose a new, completely iterative traversal algorithm for ray tracing bounding volume hierarchies that is based on storing a parent pointer with each node, and on using simple state logic to infer which node to traverse next. Though our traversal algorithm does re-visit internal nodes, it intersects each visited node only once, and in general performs exactly the same ray-box tests and ray-primitive intersection tests---and in exactly the same order---as a traditional stack-based variant. The proposed algorithm can be used for computer architectures that need to minimize the use of local memory for processing rays or those that need to minimize the data transport such as distributed multi-CPU architectures.},
+  booktitle = {Proceedings of the 27th {{Spring Conference}} on {{Computer Graphics}}},
+  series = {SCCG '11},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2013},
+  pages = {7--12},
+  keywords = {bounding volume hierarchy,ray tracing,stack-based,stack-less traversal algorithm},
+  author = {Hapala, Michal and Davidovič, Tomáš and Wald, Ingo and Havran, Vlastimil and Slusallek, Philipp}
+}
+
+@inproceedings{hapalaEfficientStacklessBVH2013a,
+  location = {{New York, NY, USA}},
+  title = {Efficient {{Stack}}-Less {{BVH Traversal}} for {{Ray Tracing}}},
+  isbn = {978-1-4503-1978-2},
+  url = {http://doi.acm.org/10.1145/2461217.2461219},
+  doi = {10.1145/2461217.2461219},
+  abstract = {We propose a new, completely iterative traversal algorithm for ray tracing bounding volume hierarchies that is based on storing a parent pointer with each node, and on using simple state logic to infer which node to traverse next. Though our traversal algorithm does re-visit internal nodes, it intersects each visited node only once, and in general performs exactly the same ray-box tests and ray-primitive intersection tests---and in exactly the same order---as a traditional stack-based variant. The proposed algorithm can be used for computer architectures that need to minimize the use of local memory for processing rays or those that need to minimize the data transport such as distributed multi-CPU architectures.},
+  booktitle = {Proceedings of the 27th {{Spring Conference}} on {{Computer Graphics}}},
+  series = {SCCG '11},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2013},
+  pages = {7--12},
+  keywords = {bounding volume hierarchy,ray tracing,stack-based,stack-less traversal algorithm},
+  author = {Hapala, Michal and Davidovič, Tomáš and Wald, Ingo and Havran, Vlastimil and Slusallek, Philipp}
+}
+
+@article{afraStacklessMultiBVHTraversal2014,
+  title = {Stackless {{Multi}}-{{BVH Traversal}} for {{CPU}}, {{MIC}} and {{GPU Ray Tracing}}},
+  volume = {33},
+  issn = {0167-7055},
+  url = {http://dx.doi.org/10.1111/cgf.12259},
+  doi = {10.1111/cgf.12259},
+  abstract = {Stackless traversal algorithms for ray tracing acceleration structures require significantly less storage per ray than ordinary stack-based ones. This advantage is important for massively parallel rendering methods, where there are many rays in flight. On SIMD architectures, a commonly used acceleration structure is the MBVH, which has multiple bounding boxes per node for improved parallelism. It scales to branching factors higher than two, for which, however, only stack-based traversal methods have been proposed so far. In this paper, we introduce a novel stackless traversal algorithm for MBVHs with up to four-way branching. Our approach replaces the stack with a small bitmask, supports dynamic ordered traversal, and has a low computation overhead. We also present efficient implementation techniques for recent CPU, MIC Intel Xeon Phi and GPU NVIDIA Kepler architectures.},
+  number = {1},
+  journaltitle = {Comput. Graph. Forum},
+  urldate = {2018-11-01},
+  date = {2014-02},
+  pages = {129--140},
+  keywords = {I.3.7 [Computer Graphics]: Three-Dimensional Graphics and Realism-Ray tracing,MBVH,ray tracing,SIMD processors,stackless traversal},
+  author = {Áfra, Attila T. and Szirmay-Kalos, László},
+  file = {/home/shelly/Zotero/storage/QTVNRYZB/afra2013cgf_mbvhsl_poster.pdf}
+}
+
+@article{novakRasterizedBoundingVolume2012,
+  title = {Rasterized {{Bounding Volume Hierarchies}}},
+  volume = {31},
+  issn = {0167-7055},
+  url = {http://dx.doi.org/10.1111/j.1467-8659.2012.03019.x},
+  doi = {10.1111/j.1467-8659.2012.03019.x},
+  abstract = {We present the rasterized bounding volume hierarchy (RBVH), a compact data structure that accelerates approximate ray casting of complex meshes and provides adjustable level of detail. During construction, we identify subtrees of BVHs containing surfaces that can be represented by height fields. For these subtrees the conventional ray-surface intersection, which possibly involves a large number of triangles, is replaced by a simple ray marching procedure to find the intersection with the surface. We describe GPU algorithms for construction, ray casting, and data querying of the RBVH that achieve comparable or higher performance than state of the art acceleration structures for triangle meshes. Moreover, RBVHs provide an inherent surface parameterization for storing data on the surfaces and natively handle triangle and point-based surface representations. We also show that RBVHs support adaptive level-of-detail and can be combined with traditional BVHs to handle complex scenes. © 2012 Wiley Periodicals, Inc.},
+  issue = {2pt2},
+  journaltitle = {Comput. Graph. Forum},
+  urldate = {2018-11-01},
+  date = {2012-05},
+  pages = {403--412},
+  keywords = {[Computer,and,data,Graphics]:,I.3.6,Methodology,structures,Techniques—Graphics,types},
+  author = {Novák, Jan and Dachsbacher, Carsten},
+  file = {/home/shelly/local/CGRA350/demo/RasterisedBVH.pdf}
+}
+
+@book{karrasMaximizingParallelismConstruction2012,
+  langid = {english},
+  title = {Maximizing {{Parallelism}} in the {{Construction}} of {{BVHs}}, {{Octrees}}, and k-d {{Trees}}},
+  isbn = {978-3-905674-41-5},
+  url = {https://diglib.eg.org:443/xmlui/handle/10.2312/EGGH.HPG12.033-037},
+  abstract = {A number of methods for constructing bounding volume hierarchies and point-based octrees on the GPU are based on the idea of ordering primitives along a space-filling curve. A major shortcoming with these methods is that they construct levels of the tree sequentially, which limits the amount of parallelism that they can achieve. We present a novel approach that improves scalability by constructing the entire tree in parallel. Our main contribution is an in-place algorithm for constructing binary radix trees, which we use as a building block for other types of trees.},
+  publisher = {{The Eurographics Association}},
+  urldate = {2018-11-01},
+  date = {2012},
+  author = {Karras, Tero},
+  file = {/home/shelly/Zotero/storage/B3XC2MGD/karras2012hpg_paper.pdf;/home/shelly/Zotero/storage/3AV7KMUG/EGGH.HPG12.html},
+  doi = {http://dx.doi.org/10.2312/EGGH/HPG12/033-037}
+}
+
+@online{Karras2012hpgPaperPdf,
+  title = {Karras2012hpg\_paper.Pdf},
+  url = {https://research.nvidia.com/sites/default/files/pubs/2012-06_Maximizing-Parallelism-in/karras2012hpg_paper.pdf},
+  urldate = {2018-11-01}
+}
+
+@online{Projects,
+  title = {Projects},
+  url = {http://www.bwfischer.com/oculusRayTracer.html},
+  urldate = {2018-11-01},
+  file = {/home/shelly/Zotero/storage/HIVZVJX2/oculusRayTracer.html}
+}
+
+@inproceedings{karrasFastParallelConstruction2013,
+  location = {{New York, NY, USA}},
+  title = {Fast {{Parallel Construction}} of {{High}}-Quality {{Bounding Volume Hierarchies}}},
+  isbn = {978-1-4503-2135-8},
+  url = {http://doi.acm.org/10.1145/2492045.2492055},
+  doi = {10.1145/2492045.2492055},
+  abstract = {We propose a new massively parallel algorithm for constructing high-quality bounding volume hierarchies (BVHs) for ray tracing. The algorithm is based on modifying an existing BVH to improve its quality, and executes in linear time at a rate of almost 40M triangles/sec on NVIDIA GTX Titan. We also propose an improved approach for parallel splitting of triangles prior to tree construction. Averaged over 20 test scenes, the resulting trees offer over 90\% of the ray tracing performance of the best offline construction method (SBVH), while previous fast GPU algorithms offer only about 50\%. Compared to state-of-the-art, our method offers a significant improvement in the majority of practical workloads that need to construct the BVH for each frame. On the average, it gives the best overall performance when tracing between 7 million and 60 billion rays per frame. This covers most interactive applications, product and architectural design, and even movie rendering.},
+  booktitle = {Proceedings of the 5th {{High}}-{{Performance Graphics Conference}}},
+  series = {HPG '13},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2013},
+  pages = {89--99},
+  keywords = {bounding volume hierarchies,ray tracing},
+  author = {Karras, Tero and Aila, Timo},
+  file = {/home/shelly/Zotero/storage/CVTGKIHK/karras2013hpg_aux.pdf;/home/shelly/Zotero/storage/GUE43UVN/karras2013hpg_paper.pdf}
+}
+
+@article{waldRayTracingDeformable2007,
+  title = {Ray {{Tracing Deformable Scenes Using Dynamic Bounding Volume Hierarchies}}},
+  volume = {26},
+  issn = {0730-0301},
+  url = {http://doi.acm.org/10.1145/1189762.1206075},
+  doi = {10.1145/1189762.1206075},
+  abstract = {The most significant deficiency of most of today's interactive ray tracers is that they are restricted to static walkthroughs. This restriction is due to the static nature of the acceleration structures used. While the best reported frame rates for static geometric models have been achieved using carefully constructed kd-trees, this article shows that bounding volume hierarchies (BVHs) can be used to efficiently ray trace large static models.More importantly, the BVH can be used to ray trace deformable models (sets of triangles whose positions change over time) with little loss of performance. A variety of efficiency techniques are used to achieve this performance, but three algorithmic changes to the typical BVH algorithm are mainly responsible. First, the BVH is built using a variant of the surface area heuristic conventionally used to build kd-trees. Second, the topology of the BVH is not changed over time so that only the bounding volumes need to be refit from frame-to-frame. Third, and most importantly, packets of rays are traced together through the BVH using a novel integrated packet-frustum traversal scheme. This traversal scheme elegantly combines the advantages of both packet traversal and frustum traversal and allows for rapid hierarchy descent for packets that hit bounding volumes as well as rapid exits for packets that miss. A BVH-based ray tracing system using these techniques is shown to achieve performance for deformable models comparable to that previously available only for static models.},
+  number = {1},
+  journaltitle = {ACM Trans. Graph.},
+  urldate = {2018-11-01},
+  date = {2007-01},
+  author = {Wald, Ingo and Boulos, Solomon and Shirley, Peter},
+  file = {/home/shelly/Zotero/storage/TUKAPPWW/togbvh.pdf}
+}
+
+@book{chajdasQuantitativeAnalysisVoxel2014,
+  langid = {english},
+  title = {Quantitative {{Analysis}} of {{Voxel Raytracing Acceleration Structures}}},
+  isbn = {978-3-905674-73-6},
+  url = {https://diglib.eg.org:443/xmlui/handle/10.2312/pgs.20141257.085-090},
+  abstract = {In this work, we provide a comprehensive analysis of GPU acceleration structures for voxel raytracing. We compare the commonly used octrees to BVH and KD trees, which are the standard in GPU triangle raytracing. Evaluating and analyzing of the behavior is complicated, as modern GPUs provide wide vector units with complex cache hierarchies. Even with sophisticated SIMD simulators, it is increasingly hard to model the hardware with sufficient detail to explain the observed performance. Therefore, instead of relying on SIMD simulation, we use hardware counters to directly measure key metrics like execution coherency on a modern GPU. We provide an extensive analysis comparing different acceleration structures for different raytracing scenarios like primary, diffuse and ambient occlusion rays. For different scenes we show that data structures commonly known for good performance, like KD-trees, are actually not suited for very wide SIMD units. In our work we show that BVH trees are most suitable for GPU raytracing and explain how the acceleration structure affects the execution coherency and ultimately performance, providing crucial information for the future design of GPU acceleration structures.},
+  publisher = {{The Eurographics Association}},
+  urldate = {2018-11-01},
+  date = {2014},
+  author = {Chajdas, Matthäus G. and Westermann, Rüdiger},
+  file = {/home/shelly/Zotero/storage/4W3EM9HP/pgs.20141257.html},
+  doi = {http://dx.doi.org/10.2312/pgs.20141257}
+}
+
+@online{F11b32e45393a356d5eae40c8eab7b8e1152Pdf,
+  title = {F11b32e45393a356d5eae40c8eab7b8e1152.Pdf},
+  url = {https://pdfs.semanticscholar.org/5979/f11b32e45393a356d5eae40c8eab7b8e1152.pdf},
+  urldate = {2018-11-01},
+  file = {/home/shelly/Zotero/storage/ZIXLGJYQ/f11b32e45393a356d5eae40c8eab7b8e1152.pdf}
+}
+
+@article{ganestamSAHGuidedSpatial2016,
+  title = {{{SAH Guided Spatial Split Partitioning}} for {{Fast BVH Construction}}},
+  volume = {35},
+  issn = {0167-7055},
+  url = {https://doi.org/10.1111/cgf.12831},
+  doi = {10.1111/cgf.12831},
+  abstract = {We present a new SAH guided approach to subdividing triangles as the scene is coarsely partitioned into smaller sets of spatially coherent triangles. Our triangle split approach is integrated into the partitioning stage of a fast BVH construction algorithm, but may as well be used as a stand alone pre-split pass. Our algorithm significantly reduces the number of split triangles compared to previous methods, while at the same time improving ray tracing performance compared to competing fast BVH construction techniques. We compare performance on Intel's Embree ray tracer and show that BVH construction with our splitting algorithm is always faster than Embree's pre-split construction algorithm. We also show that our algorithm builds significantly improved quality trees that deliver higher ray tracing performance. Our algorithm is implemented into Embree's open source ray tracing framework, and the source code will be released late 2015.},
+  number = {2},
+  journaltitle = {Comput. Graph. Forum},
+  urldate = {2018-11-01},
+  date = {2016-05},
+  pages = {285--293},
+  keywords = {Categories and Subject Descriptors according to ACM CCS,I.3.3 [Computer Graphics]: Three-Dimensional Graphics and Realism-Display Algorithms},
+  author = {Ganestam, Per and Doggett, Michael}
+}
+
+@article{ganestamSAHGuidedSpatial2016a,
+  title = {{{SAH}} Guided Spatial Split Partitioning for Fast {{BVH}} Construction},
+  volume = {35},
+  issn = {0167-7055},
+  url = {http://dl.acm.org/citation.cfm?id=3028584.3028612},
+  doi = {10.1111/cgf.12831},
+  number = {2},
+  journaltitle = {Computer Graphics Forum},
+  urldate = {2018-11-01},
+  date = {2016-01-05},
+  pages = {285-293},
+  author = {Ganestam, Per and Doggett, Michael},
+  file = {/home/shelly/Zotero/storage/LHZ3YUDB/citation.html}
+}
+
+@article{zotero-61,
+  type = {article}
+}
+
+@article{zotero-62,
+  type = {article}
+}
+
+@article{DINAS2015,
+  langid = {english},
+  title = {A Literature Review of Bounding Volumes Hierarchy Focused on Collision Detection},
+  volume = {17},
+  issn = {0123-3033},
+  url = {http://www.scielo.org.co/scielo.php?script=sci_arttext&pid=S0123-30332015000100005&nrm=iso},
+  journaltitle = {IngenierÃ­a y competitividad},
+  date = {2015-06},
+  pages = {49-62},
+  author = {Dinas, Simena AND BaÃ±Ã, JosÃ M.},
+  publisher = {{scieloco}}
+}
+
+@inproceedings{nguyenImplicitBoundingVolumes2006,
+  title = {Implicit {{Bounding Volumes}} and {{Bounding Volume Hierarchies}}},
+  abstract = {Computing and maintaining proximity information between objects are crucial tasks in modeling and simulating the world around us, as in robotic motion planning, physics-based simulation, molecular dynamics, etc. The information is important as objects in real life do not normally penetrate and most of the interactions between objects happen when they are near each other. Popular methods for answering proximity and collision queries use bounding volume hierarchies (BVHs). In these methods a bounding volume hierarchy is constructed for each object so that the object is captured in more and more details as one goes down the hierarchy. When answering a proximity query between two objects, their hierarchies are traversed from top down and the proximities of their bounding volumes are examined. Bounding volume hierarchies allow one to determine quickly if two objects are not in close proximity. The further apart the objects are, the less traversal the methods have to do and thus the less work in determining the proximity between the objects. Current bounding volume hierarchy methods use explicit bounding volumes like spheres, axis aligned bounding boxes (AABB), oriented bounding boxes (OBB), k-discrete oriented polytopes (k-DOP), and rectangle swept spheres (RSS), etc. All these bounding volumes have simple geometry and are defined explicitly with respect to the ambient space containing the objects. While working well for rigid objects, existing bounding volume hierarchies do not work well when the objects deform substantially. This dissertation presents results that show the power of implicit bounding volumes and implicit bounding volume hierarchies for proximity queries and collision detection. The first part of the dissertation studies the use of zonotopes (Minkowski sums of line segments) as bounding volumes. By defining bounding volumes implicitly through generating},
+  date = {2006},
+  keywords = {Bounding volume hierarchy,Top-down and bottom-up design,Tree traversal,Apache Axis,Collision detection,Interaction,Medical Records; Problem-Oriented,Minimum bounding box algorithms,Molecular dynamics,Motion planning,Muscle Rigidity,Physical object,Question (inquiry),Real life,Robot,RSS,Simulation,Zonohedron},
+  author = {Nguyen, An and Guibas, Leonidas J. and Latombe, Jean-Claude and Roughgarden, Tim and Agawal, Pankaj and Zhang, Li and Gao, Jie and Russel, Daniel and Yim, Mark and Basch, Julien and Hsu, David and Mitra, Niloy Jyoti and Wang, Yusu and Funke, Stefan and Fang, Qing and Skraba, Primoz},
+  file = {/home/shelly/Zotero/storage/PYS7G6L2/Nguyen et al. - 2006 - Implicit Bounding Volumes and Bounding Volume Hier.pdf}
+}
+
+@inproceedings{nguyenImplicitBoundingVolumes2006a,
+  title = {Implicit {{Bounding Volumes}} and {{Bounding Volume Hierarchies}}},
+  abstract = {Computing and maintaining proximity information between objects are crucial tasks in modeling and simulating the world around us, as in robotic motion planning, physics-based simulation, molecular dynamics, etc. The information is important as objects in real life do not normally penetrate and most of the interactions between objects happen when they are near each other. Popular methods for answering proximity and collision queries use bounding volume hierarchies (BVHs). In these methods a bounding volume hierarchy is constructed for each object so that the object is captured in more and more details as one goes down the hierarchy. When answering a proximity query between two objects, their hierarchies are traversed from top down and the proximities of their bounding volumes are examined. Bounding volume hierarchies allow one to determine quickly if two objects are not in close proximity. The further apart the objects are, the less traversal the methods have to do and thus the less work in determining the proximity between the objects. Current bounding volume hierarchy methods use explicit bounding volumes like spheres, axis aligned bounding boxes (AABB), oriented bounding boxes (OBB), k-discrete oriented polytopes (k-DOP), and rectangle swept spheres (RSS), etc. All these bounding volumes have simple geometry and are defined explicitly with respect to the ambient space containing the objects. While working well for rigid objects, existing bounding volume hierarchies do not work well when the objects deform substantially. This dissertation presents results that show the power of implicit bounding volumes and implicit bounding volume hierarchies for proximity queries and collision detection. The first part of the dissertation studies the use of zonotopes (Minkowski sums of line segments) as bounding volumes. By defining bounding volumes implicitly through generating},
+  date = {2006},
+  keywords = {Apache Axis,Bounding volume hierarchy,Collision detection,Interaction,Medical Records; Problem-Oriented,Minimum bounding box algorithms,Molecular dynamics,Motion planning,Muscle Rigidity,Physical object,Question (inquiry),Real life,Robot,RSS,Simulation,Top-down and bottom-up design,Tree traversal,Zonohedron},
+  author = {Nguyen, An and Guibas, Leonidas J. and Latombe, Jean-Claude and Roughgarden, Tim and Agawal, Pankaj and Zhang, Li and Gao, Jie and Russel, Daniel and Yim, Mark and Basch, Julien and Hsu, David and Mitra, Niloy Jyoti and Wang, Yusu and Funke, Stefan and Fang, Qing and Skraba, Primoz},
+  file = {/home/shelly/Zotero/storage/HQHW8QJH/Nguyen et al. - 2006 - Implicit Bounding Volumes and Bounding Volume Hier.pdf}
+}
+
+@inproceedings{popovObjectPartitioningConsidered2009,
+  location = {{New York, NY, USA}},
+  title = {Object {{Partitioning Considered Harmful}}: {{Space Subdivision}} for {{BVHs}}},
+  isbn = {978-1-60558-603-8},
+  url = {http://doi.acm.org/10.1145/1572769.1572772},
+  doi = {10.1145/1572769.1572772},
+  shorttitle = {Object {{Partitioning Considered Harmful}}},
+  abstract = {A major factor for the efficiency of ray tracing is the use of good acceleration structures. Recently, bounding volume hierarchies (BVHs) have become the preferred acceleration structures, due to their competitive performance and greater flexibility compared to KD trees. In this paper, we present a study on algorithms for the construction of optimal BVHs. Due to the exponential nature of the problem, constructing optimal BVHs for ray tracing remains an open topic. By exploiting the linearity of the surface area heuristic (SAH), we develop an algorithm that can find optimal partitions in polynomial time. We further generalize this algorithm and show that every SAH-based KD tree or BVH construction algorithm is a special case of the generic algorithm. Based on a number of experiments with the generic algorithm, we conclude that the assumption of non-terminating rays in the surface area cost model becomes a major obstacle for using the full potential of BVHs. We also observe that enforcing space partitioning helps to improve BVH performance. Finally, we develop a simple space partitioning algorithm for building efficient BVHs.},
+  booktitle = {Proceedings of the {{Conference}} on {{High Performance Graphics}} 2009},
+  series = {HPG '09},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2009},
+  pages = {15--22},
+  keywords = {acceleration structures,bounding volume hierarchies,construction,ray tracing,surface area heuristic},
+  author = {Popov, Stefan and Georgiev, Iliyan and Dimov, Rossen and Slusallek, Philipp},
+  file = {/home/shelly/Zotero/storage/S4QF37P3/Popov_et_al._Object_Partitioning_Considered_Harmful.pdf}
+}
+
+@book{glassnerIntroductionRayTracing1989,
+  langid = {english},
+  title = {An {{Introduction}} to {{Ray Tracing}}},
+  isbn = {978-0-12-286160-4},
+  abstract = {The creation of ever more realistic 3-D images is central to the development of computer graphics. The ray tracing technique has become one of the most popular and powerful means by which photo-realistic images can now be created. The simplicity, elegance and ease of implementation makes ray tracing an essential part of understanding and exploiting state-of-the-art computer graphics.An Introduction to Ray Tracing develops from fundamental principles to advanced applications, providing "how-to" procedures as well as a detailed understanding of the scientific foundations of ray tracing. It is also richly illustrated with four-color and black-and-white plates. This is a book which will be welcomed by all concerned with modern computer graphics, image processing, and computer-aided design. Provides practical "how-to" informationContains high quality color plates of images created using ray tracing techniquesProgresses from a basic understanding to the advanced science and application of ray tracing},
+  pagetotal = {364},
+  publisher = {{Morgan Kaufmann}},
+  date = {1989-02-11},
+  keywords = {Computers / Computer Graphics,Computers / Computer Science,Computers / Programming / Games},
+  author = {Glassner, Andrew S.},
+  eprinttype = {googlebooks}
+}
+
+@book{IntroductionRayTracing,
+  title = {An {{Introduction}} to {{Ray Tracing}}},
+  url = {https://books.google.com/books/about/An_Introduction_to_Ray_Tracing.html?id=YPblYyLqBM4C},
+  abstract = {The creation of ever more realistic 3-D images is central to the development of computer graphics. The ray tracing technique has become one of the most popular and powerful means by which photo-realistic images can now be created. The simplicity, elegance and ease of implementation makes ray tracing an essential part of understanding and exploiting state-of-the-art computer graphics.An Introduction to Ray Tracing develops from fundamental principles to advanced applications, providing "how-to" procedures as well as a detailed understanding of the scientific foundations of ray tracing. It is also richly illustrated with four-color and black-and-white plates. This is a book which will be welcomed by all concerned with modern computer graphics, image processing, and computer-aided design. Provides practical "how-to" informationContains high quality color plates of images created using ray tracing techniquesProgresses from a basic understanding to the advanced science and application of ray tracing},
+  urldate = {2018-11-01},
+  file = {/home/shelly/Zotero/storage/4PXXZ4G8/books.html}
+}
+
+@book{IntroductionRayTracinga,
+  title = {An {{Introduction}} to {{Ray Tracing}}},
+  url = {https://books.google.com/books/about/An_Introduction_to_Ray_Tracing.html?id=YPblYyLqBM4C},
+  abstract = {The creation of ever more realistic 3-D images is central to the development of computer graphics. The ray tracing technique has become one of the most popular and powerful means by which photo-realistic images can now be created. The simplicity, elegance and ease of implementation makes ray tracing an essential part of understanding and exploiting state-of-the-art computer graphics.An Introduction to Ray Tracing develops from fundamental principles to advanced applications, providing "how-to" procedures as well as a detailed understanding of the scientific foundations of ray tracing. It is also richly illustrated with four-color and black-and-white plates. This is a book which will be welcomed by all concerned with modern computer graphics, image processing, and computer-aided design. Provides practical "how-to" informationContains high quality color plates of images created using ray tracing techniquesProgresses from a basic understanding to the advanced science and application of ray tracing},
+  urldate = {2018-11-01},
+  file = {/home/shelly/Zotero/storage/4JA5HARV/books.html}
+}
+
+@inproceedings{stichSpatialSplitsBounding2009,
+  location = {{New York, NY, USA}},
+  title = {Spatial {{Splits}} in {{Bounding Volume Hierarchies}}},
+  isbn = {978-1-60558-603-8},
+  url = {http://doi.acm.org/10.1145/1572769.1572771},
+  doi = {10.1145/1572769.1572771},
+  abstract = {Bounding volume hierarchies (BVH) have become a widely used alternative to kD-trees as the acceleration structure of choice in modern ray tracing systems. However, BVHs adapt poorly to non-uniformly tessellated scenes, which leads to increased ray shooting costs. This paper presents a novel and practical BVH construction algorithm, which addresses the issue by utilizing spatial splitting similar to kD-trees. In contrast to previous preprocessing approaches, our method uses the surface area heuristic to control primitive splitting during tree construction. We show that our algorithm produces significantly more efficient hierarchies than other techniques. In addition, user parameters that directly influence splitting are eliminated, making the algorithm easily controllable.},
+  booktitle = {Proceedings of the {{Conference}} on {{High Performance Graphics}} 2009},
+  series = {HPG '09},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2009},
+  pages = {7--13},
+  keywords = {bounding volume hierarchy,ray tracing},
+  author = {Stich, Martin and Friedrich, Heiko and Dietrich, Andreas},
+  file = {/home/shelly/Zotero/storage/35KWZWDN/sbvh.pdf}
+}
+
+@inproceedings{vinklerExtendedMortonCodes2017,
+  location = {{New York, NY, USA}},
+  title = {Extended {{Morton Codes}} for {{High Performance Bounding Volume Hierarchy Construction}}},
+  isbn = {978-1-4503-5101-0},
+  url = {http://doi.acm.org/10.1145/3105762.3105782},
+  doi = {10.1145/3105762.3105782},
+  abstract = {We propose an extension to the Morton codes used for spatial sorting of scene primitives. The extended Morton codes increase the coherency of the clusters resulting from the object sorting and work better for non-uniform distribution of scene primitives. In particular, our codes are enhanced by encoding the size of the objects, applying adaptive ordering of the code bits, and using variable bit counts for different dimensions. We use these codes for constructing Bounding Volume Hierarchies (BVH) and show that the extended Morton code leads to higher quality BVH, particularly for the fastest available BVH build algorithms that heavily rely on spatial coherence of Morton code sorting. In turn, our method allows to achieve up to 54\% improvement in the BVH quality especially for scenes with a non-uniform spatial extent and varying object sizes. Our method is easy to implement into any Morton code based build algorithm as it involves only a modification of the Morton code computation step.},
+  booktitle = {Proceedings of {{High Performance Graphics}}},
+  series = {HPG '17},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2017},
+  pages = {9:1--9:8},
+  keywords = {bounding volume hierarchy,Morton codes,ray tracing},
+  author = {Vinkler, Marek and Bittner, Jiri and Havran, Vlastimil},
+  file = {/home/shelly/Zotero/storage/Q7TF2DHJ/emc2017.pdf}
+}
+
+@online{PLOCTree,
+  title = {{{PLOCTree}}},
+  url = {https://dl-acm-org.helicon.vuw.ac.nz/citation.cfm?id=3233309},
+  urldate = {2018-11-01},
+  file = {/home/shelly/Zotero/storage/QBFREM9R/a35-viitanen.pdf}
+}
+
+@inproceedings{izeAsynchronousBVHConstruction2007,
+  location = {{Aire-la-Ville, Switzerland, Switzerland}},
+  title = {Asynchronous {{BVH Construction}} for {{Ray Tracing Dynamic Scenes}} on {{Parallel Multi}}-Core {{Architectures}}},
+  isbn = {978-3-905673-50-0},
+  url = {http://dx.doi.org/10.2312/EGPGV/EGPGV07/101-108},
+  doi = {10.2312/EGPGV/EGPGV07/101-108},
+  abstract = {Recent developments have produced several techniques for interactive ray tracing of dynamic scenes. In particular, bounding volume hierarchies (BVHs) are efficient acceleration structures that handle complex triangle distributions and can accommodate deformable scenes by updating (refitting) the bounding primitive without restructuring the entire tree. Unfortunately, updating only the bounding primitive can result in a degradation of the quality of the BVH, and in some scenes will result in a dramatic deterioration of rendering performance. The typical method to avoid this degradation is to rebuild the BVH when a heuristic determines the tree is no longer efficient, but this rebuild results in a disruption of interactive system response. We present a method that removes this gradual decline in performance while enabling consistently fast BVH performance. We accomplish this by asynchronously rebuilding the BVH concurrently with rendering and animation, allowing the BVH to be restructured within a handful of frames.},
+  booktitle = {Proceedings of the 7th {{Eurographics Conference}} on {{Parallel Graphics}} and {{Visualization}}},
+  series = {EGPGV '07},
+  publisher = {{Eurographics Association}},
+  urldate = {2018-11-01},
+  date = {2007},
+  pages = {101--108},
+  author = {Ize, Thiago and Wald, Ingo and Parker, Steven G.}
+}
+
+@inproceedings{ylitieEfficientIncoherentRay2017,
+  location = {{New York, NY, USA}},
+  title = {Efficient {{Incoherent Ray Traversal}} on {{GPUs Through Compressed Wide BVHs}}},
+  isbn = {978-1-4503-5101-0},
+  url = {http://doi.acm.org/10.1145/3105762.3105773},
+  doi = {10.1145/3105762.3105773},
+  abstract = {We present a GPU-based ray traversal algorithm that operates on compressed wide BVHs and maintains the traversal stack in a compressed format. Our method reduces the amount of memory traffic significantly, which translates to 1.9--2.1× improvement in incoherent ray traversal performance compared to the current state of the art. Furthermore, the memory consumption of our hierarchy is 35--60\% of a typical uncompressed BVH. In addition, we present an algorithmically efficient method for converting a binary BVH into a wide BVH in a SAH-optimal fashion, and an improved method for ordering the child nodes at build time for the purposes of octant-aware fixed-order traversal.},
+  booktitle = {Proceedings of {{High Performance Graphics}}},
+  series = {HPG '17},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2017},
+  pages = {4:1--4:13},
+  keywords = {acceleration structures,GPU,ray tracing},
+  author = {Ylitie, Henri and Karras, Tero and Laine, Samuli},
+  file = {/home/shelly/Zotero/storage/H9YI4BB4/Ylitie et al. - 2017 - Efficient Incoherent Ray Traversal on GPUs Through.pdf}
+}
+
+@article{lauterbachFastBVHConstruction2009,
+  langid = {english},
+  title = {Fast {{BVH Construction}} on {{GPUs}}},
+  issn = {1467-8659},
+  url = {https://diglib.eg.org:443/xmlui/handle/10.2312/CGF.v28i2pp375-384},
+  abstract = {We present two novel parallel algorithms for rapidly constructing bounding volume hierarchies on manycore GPUs. The first uses a linear ordering derived from spatial Morton codes to build hierarchies extremely quickly and with high parallel scalability. The second is a top-down approach that uses the surface area heuristic (SAH) to build hierarchies optimized for fast ray tracing. Both algorithms are combined into a hybrid algorithm that removes existing bottlenecks in the algorithm for GPU construction performance and scalability leading to significantly decreased build time. The resulting hierarchies are close in to optimized SAH hierarchies, but the construction process is substantially faster, leading to a significant net benefit when both construction and traversal cost are accounted for. Our preliminary results show that current GPU architectures can compete with CPU implementations of hierarchy construction running on multicore systems. In practice, we can construct hierarchies of models with up to several million triangles and use them for fast ray tracing or other applications.},
+  urldate = {2018-11-01},
+  date = {2009},
+  author = {Lauterbach, C. and Garland, M. and Sengupta, S. and Luebke, D. and Manocha, D.},
+  file = {/home/shelly/Zotero/storage/PQR3K5BH/CGF.html}
+}
+
+@thesis{izeEfficientAccelerationStructures2009,
+  location = {{Salt Lake City, UT, USA}},
+  title = {Efficient {{Acceleration Structures}} for {{Ray Tracing Static}} and {{Dynamic Scenes}}},
+  abstract = {This dissertation presents efficient acceleration structures for ray tracing static and dynamic scenes. The first method for reducing render time shows how the general binary space partitioning (BSP) tree, unlike the kd-tree variant that uses axis aligned splitting planes, can be used to render static scenes roughly as fast to several times faster than other acceleration structures. The BSP is especially useful for handling geometry configurations that cause substantial slow downs in other acceleration structures; however, its slow build time limits it to applications where the scene can be built offline. Another method improves grid-based acceleration structure efficiency by analytically determining the optimal single or multilevel grid resolutions for various classes of scenes. In particular, we show for manifold-like models composed of compact triangles that storage is linear in the number of triangles,  N, and render complexity goes from O(N 1/3) for single level grids to O(N 1/(2d+1)) for  d levels. On the other hand, manifold-like models composed of long skinny triangles require super linear memory in order to achieve sublinear time complexity; for a single level grid, our analysis states that  O(N3/2) cells must be used and that this gives a time complexity of O(N 1/2). If coherent ray packets are available, we show that using a frustum traversal allows us to simultaneously traverse a packet of rays through a grid, which results in a substantial speedup over the traditional single ray traversal.Dynamic scenes require that the acceleration structure be quickly updated each frame. Pairing the frustum traversal with a quick grid rebuild allows for interactive ray tracing of fully dynamic scenes. Furthermore, we present a highly efficient parallel grid build that scales to many processors. For dynamic scenes that are deformable, a bounding volume hierarchy (BVH) can be updated by quickly refitting its bounding volumes rather than performing a slow BVH rebuild. Unfortunately, refitting can degrade the quality of the tree and lead to worse render times. We maintain a high quality BVH without having to wait for the slow rebuild by refitting the BVH every frame while simultaneously building another BVH from scratch, possibly over the course of several frames. When the new BVH is complete, it replaces the older refitted BVH.},
+  institution = {{University of Utah}},
+  type = {PhD Thesis},
+  date = {2009},
+  author = {Ize, Thiago},
+  file = {/home/shelly/Zotero/storage/K3IUB8LU/thesis_ize.pdf}
+}
+
+@inproceedings{legrandMortonIntegralsHigh2015,
+  location = {{New York, NY, USA}},
+  title = {Morton {{Integrals}} for {{High Speed Geometry Simplification}}},
+  isbn = {978-1-4503-3707-6},
+  url = {http://doi.acm.org/10.1145/2790060.2790071},
+  doi = {10.1145/2790060.2790071},
+  abstract = {Real time geometry processing has progressively reached a performance level that makes a number of signal-inspired primitives practical for on-line applications scenarios. This often comes through the joint design of operators, data structure and even dedicated hardware. Among the major classes of geometric operators, filtering and super-sampling (via tessellation) have been successfully expressed under high-performance constraints. The subsampling operator i.e., adaptive simplification, remains however a challenging case for non-trivial input models. In this paper, we build a fast geometry simplification algorithm over a new concept: Morton Integrals. By summing up quadric error metric matrices along Morton-ordered surface samples, we can extract concurrently the nodes of an adaptive cut in the so-defined implicit hierarchy, and optimize all simplified vertices in parallel. This approach is inspired by integral images and exploits recent advances in high performance spatial hierarchy construction and traversal. As a result, our GPU implementation can downsample a mesh made of several millions of polygons at interactive rates, while providing better quality than uniform simplification and preserving important salient features. We present results for surface meshes, polygon soups and point clouds, and discuss variations of our approach to account for per-sample attributes and alternatives error metrics.},
+  booktitle = {Proceedings of the 7th {{Conference}} on {{High}}-{{Performance Graphics}}},
+  series = {HPG '15},
+  publisher = {{ACM}},
+  urldate = {2018-11-01},
+  date = {2015},
+  pages = {105--112},
+  keywords = {adaptive clustering,GPU algorithms,mesh simplification,Morton code},
+  author = {Legrand, Hélène and Boubekeur, Tamy},
+  file = {/home/shelly/Zotero/toread/HSGS.pdf}
+}
+
+@article{lauterbachFastBVHConstruction2009a,
+  langid = {english},
+  title = {Fast {{BVH Construction}} on {{GPUs}}},
+  issn = {1467-8659},
+  url = {https://diglib.eg.org:443/xmlui/handle/10.2312/CGF.v28i2pp375-384},
+  abstract = {We present two novel parallel algorithms for rapidly constructing bounding volume hierarchies on manycore GPUs. The first uses a linear ordering derived from spatial Morton codes to build hierarchies extremely quickly and with high parallel scalability. The second is a top-down approach that uses the surface area heuristic (SAH) to build hierarchies optimized for fast ray tracing. Both algorithms are combined into a hybrid algorithm that removes existing bottlenecks in the algorithm for GPU construction performance and scalability leading to significantly decreased build time. The resulting hierarchies are close in to optimized SAH hierarchies, but the construction process is substantially faster, leading to a significant net benefit when both construction and traversal cost are accounted for. Our preliminary results show that current GPU architectures can compete with CPU implementations of hierarchy construction running on multicore systems. In practice, we can construct hierarchies of models with up to several million triangles and use them for fast ray tracing or other applications.},
+  urldate = {2018-11-01},
+  date = {2009},
+  author = {Lauterbach, C. and Garland, M. and Sengupta, S. and Luebke, D. and Manocha, D.},
+  file = {/home/shelly/Zotero/toread/Lauterbach_et_al-2009-Computer_Graphics_Forum.pdf;/home/shelly/Zotero/storage/ZZB4ECNN/CGF.html}
+}
+
+@inproceedings{waldFastConstructionSAHbased2007,
+  location = {{Washington, DC, USA}},
+  title = {On {{Fast Construction}} of {{SAH}}-Based {{Bounding Volume Hierarchies}}},
+  isbn = {978-1-4244-1629-5},
+  url = {https://doi.org/10.1109/RT.2007.4342588},
+  doi = {10.1109/RT.2007.4342588},
+  abstract = {With ray traversal performance reaching the point where real-time ray tracing becomes practical, ray tracing research is now shifting away from faster traversal, and towards the question what has to be done to use it in truly interactive applications such as games. Such applications are problematic because when geometry changes every frame, the ray tracer's internal index data structures are no longer valid. Fully rebuilding all data structures every frame is the most general approach to handling changing geometry, but was long considered impractical except for grid-based grid based ray tracers, trivial scenes, or reduced quality of the index structure. In this paper, we investigate how some of the fast, approximate construction techniques that have recently been proposed for kd-trees can also be applied to bounding volume hierarchies (BVHs). We argue that these work even better for BVHs than they do for kd-trees, and demonstrate that when using those techniques, BVHs can be rebuilt up to 10×faster than competing kd-tree based techniques.},
+  booktitle = {Proceedings of the 2007 {{IEEE Symposium}} on {{Interactive Ray Tracing}}},
+  series = {RT '07},
+  publisher = {{IEEE Computer Society}},
+  urldate = {2018-11-01},
+  date = {2007},
+  pages = {33--40},
+  author = {Wald, Ingo},
+  file = {/home/shelly/Zotero/storage/7KEXVAGV/fastbuild.pdf}
+}
+
+

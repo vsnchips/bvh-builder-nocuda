@@ -1,5 +1,6 @@
 #pragma once
 
+#include <experimental/filesystem>
 #include "cgra/mesh.hpp"
 #include "cgra/shader.hpp"
 
@@ -37,6 +38,7 @@ public:
   //Organise this file into responsibilities:
   // It updates
     void updateScene(clock_t nt);
+    clock_t frame_timer;
 
   // Has a BVH Renderer:
     BVHRenderer  * app_BVHRenderer;
@@ -71,20 +73,32 @@ public:
     void drawApp();
     void gl_ViewPrep();
   ////Maintains and sends scene data to the shader:
-  //Transforms
+  //View Transforms
     void sendUniforms();
     glm::mat4 viewMatrix; //Deprecated
     glm::mat4 projectionMatrix;
     float m_scale;
     glm::vec2 m_viewportSize;
     glm::vec3 m_translation;
+    glm::vec2 u_PolarLook = glm::vec2(0, 0);
     glm::vec3 xax,yax,zax;
     glm::vec3 polarrotation;
     glm::mat4 m_rotationMatrix,m_modelTransform;
+  // Scene Transforms
+    glm::mat4 u_sceneTransforms[20];
   //Lights
-    glm::vec3 lightDir;
+    glm::vec3 u_lightDir;
+    glm::vec3 u_lightColor;
   //Other uniforms
-    
+    bool u_previewBBs;
+    bool u_primEdges = false;
+    bool u_bvhEdges = true;
+    bool u_showPrims = true;
+    bool u_bruteForcePrims = false;
+    int  u_headNode = -1 ;
+    int  u_bruteForceCount = 500;
+
+  
   //Has and operates a window
     GLFWwindow * m_window;
     GLFWwindow * dummy;
@@ -102,6 +116,9 @@ public:
     void onMouseButton(int button, int action, int mods);
     void onCursorPos(double xpos, double ypos);
     void onScroll(double xoffset, double yoffset);
+    void doWasd();
+  // Has interaction state
+    bool wasd[4];
     // Interaction methods
     void mainWindowPick();   //TODO:reimplement this when needed
     // The clock
