@@ -19,7 +19,7 @@ and then
 make -j <cores>
 ```
 
-Built on Arch linux. I might jump over to Visual studio and make some project files to build it on windows if someone really wants me to, and asks nicely :)
+Built on Arch Linux. I might jump over to Visual studio and make some project files to build it on windows if someone really wants me to, and asks nicely :)
 
 ## How it works
 
