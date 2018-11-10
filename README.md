@@ -2,6 +2,10 @@
 
 This is a demo built by Dan Aston https://danaston.nz
 
+It builds a bounding volume heirarchy using agglomerative techniques.
+Building is currently single threaded.
+Traversal of the BVH is implemented as an intersection function in glsl, called for rays in the fragment shader.
+
 ## How to build it
 
 The root source directory is srctree. 
@@ -52,3 +56,10 @@ White tinting counts the valid intersections and subsequent visitation of BVH no
 
 Red tinting indicates that the occluding geometry is deep in the bvh from the perspective of the testing ray. It indicates sequential occluded bounding hull tests while "climbing out" from "behind" the occluder.
 
+
+## Roadmap
+
+TODO: 
+> implement single-dispatch parallel build in a compute shader.
+> ????
+> Make it better!
