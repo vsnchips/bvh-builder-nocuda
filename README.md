@@ -19,6 +19,8 @@ and then
 make -j <cores>
 ```
 
+Built on Arch linux. I might jump over to Visual studio and make it build on windows if someone really wants me to.
+
 ## How it works
 
 The executable is "bin/BVH_Renderer". It requires no arguments.
