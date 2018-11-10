@@ -1,6 +1,6 @@
 #  Agglomerative BVH Demo App
 
-This is a demo built by Dan Aston (http://danaston.nz)
+This is a demo built by Dan Aston https://danaston.nz
 
 ## How to build it
 
@@ -35,20 +35,20 @@ Now, click "Send the BVH to the GPU".
 
 ## Interaction
 
-You can fly around with w a s d
-You can orient the view while holding the left mouse button.
-You can x/y pan with the middle mouse.
-You can x/z pan with the right mouse.
-You can toggle rendering of either traversed primitives or brute forced primitives.
-You can slide the head node pointer around to highlight subtrees to observe the agglomeration pattern.
+You can fly around with w a s d\
+You can orient the view while holding the left mouse button\
+You can x/y pan with the middle mouse.\
+You can x/z pan with the right mouse.\
+You can toggle rendering of either traversed primitives or brute forced primitives.\
+You can slide the head node pointer around to highlight subtrees to observe the agglomeration pattern.\
 
 ## What do the colors mean?
 
 Ray -> primitive intersection events return the color of their normal.
 
-The bvh is integrated like a participating medium.
+The BVH is integrated like a participating medium.
 
-White tinting counts the valid intersections and subsequent visitation of bvh nodes, and red tinting counts the iterations of the trace loop, which is finitely rolled out.
+White tinting counts the valid intersections and subsequent visitation of BVH nodes, and red tinting counts the iterations of the trace loop, which is finitely rolled out.
 
 Red tinting indicates that the occluding geometry is deep in the bvh from the perspective of the testing ray. It indicates sequential occluded bounding hull tests while "climbing out" from "behind" the occluder.
 
